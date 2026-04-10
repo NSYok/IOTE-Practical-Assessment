@@ -1,5 +1,5 @@
 """
-Chiller Simulator — 3 × 500 RT York/Carrier chillers (BACnet/IP)
+Chiller Simulator — 3 × 500 RT chillers (BACnet/IP)
 
 Data ranges are calibrated for Bangkok climate:
   - Chilled water supply (evap leaving) : 44–46 °F  (~7–8 °C)

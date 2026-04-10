@@ -1,0 +1,797 @@
+# =============================================================================
+# Brick Schema Model — 4-Floor Commercial Office Building
+# Assessment: IoT Engineer Practical Assessment
+#
+# Equipment summary:
+#   Chiller Plant : 3 Chillers + 3 CHWP + 3 CDWP + 3 Cooling Towers
+#   Air Dist.     : 4 AHUs (1/floor) + 16 VAVs (4/floor)
+#   Environmental : 8 IAQ Sensors (2/floor) + 1 Outdoor Weather Station
+#   Electrical    : 21 Power Meters (1 main + 4 floor + 16 equipment sub-meters)
+#
+# Brick Schema reference: https://brickschema.org/schema/Brick
+# =============================================================================
+
+@prefix brick: <https://brickschema.org/schema/Brick#> .
+@prefix bldg:  <urn:bldg/> .
+@prefix rdf:   <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs:  <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix owl:   <http://www.w3.org/2002/07/owl#> .
+@prefix xsd:   <http://www.w3.org/2001/XMLSchema#> .
+
+# =============================================================================
+# ONTOLOGY HEADER
+# =============================================================================
+
+<urn:bldg/> a owl:Ontology ;
+    rdfs:label "4-Floor Commercial Office Building — Brick Model" ;
+    rdfs:comment "Complete Brick Schema model for IoT Engineer Assessment. Covers HVAC, IAQ, and electrical metering infrastructure." .
+
+# =============================================================================
+# SECTION 1: SPATIAL HIERARCHY
+# Building → Floors → HVAC Zones
+# =============================================================================
+
+bldg:building a brick:Building ;
+    rdfs:label "4-Floor Commercial Office Building" .
+
+# --- Floors ---
+bldg:floor_1 a brick:Floor ;
+    rdfs:label "Floor 1" ;
+    brick:isPartOf bldg:building .
+
+bldg:floor_2 a brick:Floor ;
+    rdfs:label "Floor 2" ;
+    brick:isPartOf bldg:building .
+
+bldg:floor_3 a brick:Floor ;
+    rdfs:label "Floor 3" ;
+    brick:isPartOf bldg:building .
+
+bldg:floor_4 a brick:Floor ;
+    rdfs:label "Floor 4" ;
+    brick:isPartOf bldg:building .
+
+# --- HVAC Zones: 4 per floor (A–D), 16 total ---
+bldg:zone_1A a brick:HVAC_Zone ; rdfs:label "Zone 1A" ; brick:isPartOf bldg:floor_1 .
+bldg:zone_1B a brick:HVAC_Zone ; rdfs:label "Zone 1B" ; brick:isPartOf bldg:floor_1 .
+bldg:zone_1C a brick:HVAC_Zone ; rdfs:label "Zone 1C" ; brick:isPartOf bldg:floor_1 .
+bldg:zone_1D a brick:HVAC_Zone ; rdfs:label "Zone 1D" ; brick:isPartOf bldg:floor_1 .
+
+bldg:zone_2A a brick:HVAC_Zone ; rdfs:label "Zone 2A" ; brick:isPartOf bldg:floor_2 .
+bldg:zone_2B a brick:HVAC_Zone ; rdfs:label "Zone 2B" ; brick:isPartOf bldg:floor_2 .
+bldg:zone_2C a brick:HVAC_Zone ; rdfs:label "Zone 2C" ; brick:isPartOf bldg:floor_2 .
+bldg:zone_2D a brick:HVAC_Zone ; rdfs:label "Zone 2D" ; brick:isPartOf bldg:floor_2 .
+
+bldg:zone_3A a brick:HVAC_Zone ; rdfs:label "Zone 3A" ; brick:isPartOf bldg:floor_3 .
+bldg:zone_3B a brick:HVAC_Zone ; rdfs:label "Zone 3B" ; brick:isPartOf bldg:floor_3 .
+bldg:zone_3C a brick:HVAC_Zone ; rdfs:label "Zone 3C" ; brick:isPartOf bldg:floor_3 .
+bldg:zone_3D a brick:HVAC_Zone ; rdfs:label "Zone 3D" ; brick:isPartOf bldg:floor_3 .
+
+bldg:zone_4A a brick:HVAC_Zone ; rdfs:label "Zone 4A" ; brick:isPartOf bldg:floor_4 .
+bldg:zone_4B a brick:HVAC_Zone ; rdfs:label "Zone 4B" ; brick:isPartOf bldg:floor_4 .
+bldg:zone_4C a brick:HVAC_Zone ; rdfs:label "Zone 4C" ; brick:isPartOf bldg:floor_4 .
+bldg:zone_4D a brick:HVAC_Zone ; rdfs:label "Zone 4D" ; brick:isPartOf bldg:floor_4 .
+
+# =============================================================================
+# SECTION 2: CHILLER PLANT
+# 3 × 500 RT Chillers (BACnet/IP)
+# =============================================================================
+
+# --- Chiller CH-1 ---
+bldg:chiller_1 a brick:Chiller ;
+    rdfs:label "Chiller CH-1 (500 RT)" ;
+    brick:isPartOf bldg:building ;
+    brick:hasPoint
+        bldg:ch1_chw_supply_temp ,
+        bldg:ch1_chw_return_temp ,
+        bldg:ch1_chw_flow ,
+        bldg:ch1_refrig_temp ,
+        bldg:ch1_delta_temp ,
+        bldg:ch1_approach_temp ,
+        bldg:ch1_status_read ,
+        bldg:ch1_status_write ,
+        bldg:ch1_power ,
+        bldg:ch1_alarm ,
+        bldg:ch1_pct_rla ,
+        bldg:ch1_efficiency ,
+        bldg:ch1_cooling_rate .
+
+bldg:ch1_chw_supply_temp   a brick:Chilled_Water_Supply_Temperature_Sensor ; rdfs:label "CH-1 Evap Leaving Water Temp"     ; brick:isPointOf bldg:chiller_1 .
+bldg:ch1_chw_return_temp   a brick:Chilled_Water_Return_Temperature_Sensor ; rdfs:label "CH-1 Evap Entering Water Temp"    ; brick:isPointOf bldg:chiller_1 .
+bldg:ch1_chw_flow          a brick:Chilled_Water_Flow_Sensor               ; rdfs:label "CH-1 Evap Water Flow Rate (GPM)"  ; brick:isPointOf bldg:chiller_1 .
+bldg:ch1_refrig_temp       a brick:Refrigerant_Temperature_Sensor          ; rdfs:label "CH-1 Evap Sat Refrigerant Temp"   ; brick:isPointOf bldg:chiller_1 .
+bldg:ch1_delta_temp        a brick:Differential_Temperature_Sensor         ; rdfs:label "CH-1 Evap Water Delta Temp"        ; brick:isPointOf bldg:chiller_1 .
+bldg:ch1_approach_temp     a brick:Temperature_Sensor                      ; rdfs:label "CH-1 Evap Approach Temp"           ; brick:isPointOf bldg:chiller_1 .
+bldg:ch1_status_read       a brick:On_Off_Status                           ; rdfs:label "CH-1 Running Status"               ; brick:isPointOf bldg:chiller_1 .
+bldg:ch1_status_write      a brick:On_Off_Command                          ; rdfs:label "CH-1 Start/Stop Command"           ; brick:isPointOf bldg:chiller_1 .
+bldg:ch1_power             a brick:Electric_Power_Sensor                   ; rdfs:label "CH-1 Power (kW)"                   ; brick:isPointOf bldg:chiller_1 .
+bldg:ch1_alarm             a brick:Alarm                                   ; rdfs:label "CH-1 Alarm Status"                 ; brick:isPointOf bldg:chiller_1 .
+bldg:ch1_pct_rla           a brick:Current_Sensor                          ; rdfs:label "CH-1 Percentage RLA (%)"           ; brick:isPointOf bldg:chiller_1 .
+bldg:ch1_efficiency        a brick:Efficiency_Sensor                       ; rdfs:label "CH-1 Efficiency (kW/RT)"           ; brick:isPointOf bldg:chiller_1 .
+bldg:ch1_cooling_rate      a brick:Cooling_Capacity_Sensor                 ; rdfs:label "CH-1 Cooling Rate (RT)"            ; brick:isPointOf bldg:chiller_1 .
+
+# --- Chiller CH-2 ---
+bldg:chiller_2 a brick:Chiller ;
+    rdfs:label "Chiller CH-2 (500 RT)" ;
+    brick:isPartOf bldg:building ;
+    brick:hasPoint
+        bldg:ch2_chw_supply_temp ,
+        bldg:ch2_chw_return_temp ,
+        bldg:ch2_chw_flow ,
+        bldg:ch2_refrig_temp ,
+        bldg:ch2_delta_temp ,
+        bldg:ch2_approach_temp ,
+        bldg:ch2_status_read ,
+        bldg:ch2_status_write ,
+        bldg:ch2_power ,
+        bldg:ch2_alarm ,
+        bldg:ch2_pct_rla ,
+        bldg:ch2_efficiency ,
+        bldg:ch2_cooling_rate .
+
+bldg:ch2_chw_supply_temp   a brick:Chilled_Water_Supply_Temperature_Sensor ; rdfs:label "CH-2 Evap Leaving Water Temp"     ; brick:isPointOf bldg:chiller_2 .
+bldg:ch2_chw_return_temp   a brick:Chilled_Water_Return_Temperature_Sensor ; rdfs:label "CH-2 Evap Entering Water Temp"    ; brick:isPointOf bldg:chiller_2 .
+bldg:ch2_chw_flow          a brick:Chilled_Water_Flow_Sensor               ; rdfs:label "CH-2 Evap Water Flow Rate (GPM)"  ; brick:isPointOf bldg:chiller_2 .
+bldg:ch2_refrig_temp       a brick:Refrigerant_Temperature_Sensor          ; rdfs:label "CH-2 Evap Sat Refrigerant Temp"   ; brick:isPointOf bldg:chiller_2 .
+bldg:ch2_delta_temp        a brick:Differential_Temperature_Sensor         ; rdfs:label "CH-2 Evap Water Delta Temp"        ; brick:isPointOf bldg:chiller_2 .
+bldg:ch2_approach_temp     a brick:Temperature_Sensor                      ; rdfs:label "CH-2 Evap Approach Temp"           ; brick:isPointOf bldg:chiller_2 .
+bldg:ch2_status_read       a brick:On_Off_Status                           ; rdfs:label "CH-2 Running Status"               ; brick:isPointOf bldg:chiller_2 .
+bldg:ch2_status_write      a brick:On_Off_Command                          ; rdfs:label "CH-2 Start/Stop Command"           ; brick:isPointOf bldg:chiller_2 .
+bldg:ch2_power             a brick:Electric_Power_Sensor                   ; rdfs:label "CH-2 Power (kW)"                   ; brick:isPointOf bldg:chiller_2 .
+bldg:ch2_alarm             a brick:Alarm                                   ; rdfs:label "CH-2 Alarm Status"                 ; brick:isPointOf bldg:chiller_2 .
+bldg:ch2_pct_rla           a brick:Current_Sensor                          ; rdfs:label "CH-2 Percentage RLA (%)"           ; brick:isPointOf bldg:chiller_2 .
+bldg:ch2_efficiency        a brick:Efficiency_Sensor                       ; rdfs:label "CH-2 Efficiency (kW/RT)"           ; brick:isPointOf bldg:chiller_2 .
+bldg:ch2_cooling_rate      a brick:Cooling_Capacity_Sensor                 ; rdfs:label "CH-2 Cooling Rate (RT)"            ; brick:isPointOf bldg:chiller_2 .
+
+# --- Chiller CH-3 ---
+bldg:chiller_3 a brick:Chiller ;
+    rdfs:label "Chiller CH-3 (500 RT)" ;
+    brick:isPartOf bldg:building ;
+    brick:hasPoint
+        bldg:ch3_chw_supply_temp ,
+        bldg:ch3_chw_return_temp ,
+        bldg:ch3_chw_flow ,
+        bldg:ch3_refrig_temp ,
+        bldg:ch3_delta_temp ,
+        bldg:ch3_approach_temp ,
+        bldg:ch3_status_read ,
+        bldg:ch3_status_write ,
+        bldg:ch3_power ,
+        bldg:ch3_alarm ,
+        bldg:ch3_pct_rla ,
+        bldg:ch3_efficiency ,
+        bldg:ch3_cooling_rate .
+
+bldg:ch3_chw_supply_temp   a brick:Chilled_Water_Supply_Temperature_Sensor ; rdfs:label "CH-3 Evap Leaving Water Temp"     ; brick:isPointOf bldg:chiller_3 .
+bldg:ch3_chw_return_temp   a brick:Chilled_Water_Return_Temperature_Sensor ; rdfs:label "CH-3 Evap Entering Water Temp"    ; brick:isPointOf bldg:chiller_3 .
+bldg:ch3_chw_flow          a brick:Chilled_Water_Flow_Sensor               ; rdfs:label "CH-3 Evap Water Flow Rate (GPM)"  ; brick:isPointOf bldg:chiller_3 .
+bldg:ch3_refrig_temp       a brick:Refrigerant_Temperature_Sensor          ; rdfs:label "CH-3 Evap Sat Refrigerant Temp"   ; brick:isPointOf bldg:chiller_3 .
+bldg:ch3_delta_temp        a brick:Differential_Temperature_Sensor         ; rdfs:label "CH-3 Evap Water Delta Temp"        ; brick:isPointOf bldg:chiller_3 .
+bldg:ch3_approach_temp     a brick:Temperature_Sensor                      ; rdfs:label "CH-3 Evap Approach Temp"           ; brick:isPointOf bldg:chiller_3 .
+bldg:ch3_status_read       a brick:On_Off_Status                           ; rdfs:label "CH-3 Running Status"               ; brick:isPointOf bldg:chiller_3 .
+bldg:ch3_status_write      a brick:On_Off_Command                          ; rdfs:label "CH-3 Start/Stop Command"           ; brick:isPointOf bldg:chiller_3 .
+bldg:ch3_power             a brick:Electric_Power_Sensor                   ; rdfs:label "CH-3 Power (kW)"                   ; brick:isPointOf bldg:chiller_3 .
+bldg:ch3_alarm             a brick:Alarm                                   ; rdfs:label "CH-3 Alarm Status"                 ; brick:isPointOf bldg:chiller_3 .
+bldg:ch3_pct_rla           a brick:Current_Sensor                          ; rdfs:label "CH-3 Percentage RLA (%)"           ; brick:isPointOf bldg:chiller_3 .
+bldg:ch3_efficiency        a brick:Efficiency_Sensor                       ; rdfs:label "CH-3 Efficiency (kW/RT)"           ; brick:isPointOf bldg:chiller_3 .
+bldg:ch3_cooling_rate      a brick:Cooling_Capacity_Sensor                 ; rdfs:label "CH-3 Cooling Rate (RT)"            ; brick:isPointOf bldg:chiller_3 .
+
+# =============================================================================
+# SECTION 3: CHILLED WATER PUMPS — CHP-1, CHP-2, CHP-3 (Modbus TCP, VSD)
+# =============================================================================
+
+bldg:chp_1 a brick:Chilled_Water_Pump ;
+    rdfs:label "Chilled Water Pump CHP-1" ;
+    brick:isPartOf bldg:building ;
+    brick:hasPoint
+        bldg:chp1_status_read , bldg:chp1_status_write , bldg:chp1_alarm ,
+        bldg:chp1_freq_read , bldg:chp1_freq_write , bldg:chp1_power .
+
+bldg:chp1_status_read  a brick:On_Off_Status    ; rdfs:label "CHP-1 Running Status"         ; brick:isPointOf bldg:chp_1 .
+bldg:chp1_status_write a brick:On_Off_Command   ; rdfs:label "CHP-1 Start/Stop Command"     ; brick:isPointOf bldg:chp_1 .
+bldg:chp1_alarm        a brick:Alarm            ; rdfs:label "CHP-1 Alarm Status"           ; brick:isPointOf bldg:chp_1 .
+bldg:chp1_freq_read    a brick:Frequency_Sensor ; rdfs:label "CHP-1 VSD Frequency (Hz)"     ; brick:isPointOf bldg:chp_1 .
+bldg:chp1_freq_write   a brick:Frequency_Command; rdfs:label "CHP-1 VSD Freq Command (Hz)"  ; brick:isPointOf bldg:chp_1 .
+bldg:chp1_power        a brick:Electric_Power_Sensor ; rdfs:label "CHP-1 Power (kW)"        ; brick:isPointOf bldg:chp_1 .
+
+bldg:chp_2 a brick:Chilled_Water_Pump ;
+    rdfs:label "Chilled Water Pump CHP-2" ;
+    brick:isPartOf bldg:building ;
+    brick:hasPoint
+        bldg:chp2_status_read , bldg:chp2_status_write , bldg:chp2_alarm ,
+        bldg:chp2_freq_read , bldg:chp2_freq_write , bldg:chp2_power .
+
+bldg:chp2_status_read  a brick:On_Off_Status    ; rdfs:label "CHP-2 Running Status"         ; brick:isPointOf bldg:chp_2 .
+bldg:chp2_status_write a brick:On_Off_Command   ; rdfs:label "CHP-2 Start/Stop Command"     ; brick:isPointOf bldg:chp_2 .
+bldg:chp2_alarm        a brick:Alarm            ; rdfs:label "CHP-2 Alarm Status"           ; brick:isPointOf bldg:chp_2 .
+bldg:chp2_freq_read    a brick:Frequency_Sensor ; rdfs:label "CHP-2 VSD Frequency (Hz)"     ; brick:isPointOf bldg:chp_2 .
+bldg:chp2_freq_write   a brick:Frequency_Command; rdfs:label "CHP-2 VSD Freq Command (Hz)"  ; brick:isPointOf bldg:chp_2 .
+bldg:chp2_power        a brick:Electric_Power_Sensor ; rdfs:label "CHP-2 Power (kW)"        ; brick:isPointOf bldg:chp_2 .
+
+bldg:chp_3 a brick:Chilled_Water_Pump ;
+    rdfs:label "Chilled Water Pump CHP-3" ;
+    brick:isPartOf bldg:building ;
+    brick:hasPoint
+        bldg:chp3_status_read , bldg:chp3_status_write , bldg:chp3_alarm ,
+        bldg:chp3_freq_read , bldg:chp3_freq_write , bldg:chp3_power .
+
+bldg:chp3_status_read  a brick:On_Off_Status    ; rdfs:label "CHP-3 Running Status"         ; brick:isPointOf bldg:chp_3 .
+bldg:chp3_status_write a brick:On_Off_Command   ; rdfs:label "CHP-3 Start/Stop Command"     ; brick:isPointOf bldg:chp_3 .
+bldg:chp3_alarm        a brick:Alarm            ; rdfs:label "CHP-3 Alarm Status"           ; brick:isPointOf bldg:chp_3 .
+bldg:chp3_freq_read    a brick:Frequency_Sensor ; rdfs:label "CHP-3 VSD Frequency (Hz)"     ; brick:isPointOf bldg:chp_3 .
+bldg:chp3_freq_write   a brick:Frequency_Command; rdfs:label "CHP-3 VSD Freq Command (Hz)"  ; brick:isPointOf bldg:chp_3 .
+bldg:chp3_power        a brick:Electric_Power_Sensor ; rdfs:label "CHP-3 Power (kW)"        ; brick:isPointOf bldg:chp_3 .
+
+# =============================================================================
+# SECTION 4: CONDENSER WATER PUMPS — CDP-1, CDP-2, CDP-3 (Modbus TCP, VSD)
+# =============================================================================
+
+bldg:cdp_1 a brick:Condenser_Water_Pump ;
+    rdfs:label "Condenser Water Pump CDP-1" ;
+    brick:isPartOf bldg:building ;
+    brick:hasPoint
+        bldg:cdp1_status_read , bldg:cdp1_status_write , bldg:cdp1_alarm ,
+        bldg:cdp1_freq_read , bldg:cdp1_freq_write , bldg:cdp1_power .
+
+bldg:cdp1_status_read  a brick:On_Off_Status    ; rdfs:label "CDP-1 Running Status"         ; brick:isPointOf bldg:cdp_1 .
+bldg:cdp1_status_write a brick:On_Off_Command   ; rdfs:label "CDP-1 Start/Stop Command"     ; brick:isPointOf bldg:cdp_1 .
+bldg:cdp1_alarm        a brick:Alarm            ; rdfs:label "CDP-1 Alarm Status"           ; brick:isPointOf bldg:cdp_1 .
+bldg:cdp1_freq_read    a brick:Frequency_Sensor ; rdfs:label "CDP-1 VSD Frequency (Hz)"     ; brick:isPointOf bldg:cdp_1 .
+bldg:cdp1_freq_write   a brick:Frequency_Command; rdfs:label "CDP-1 VSD Freq Command (Hz)"  ; brick:isPointOf bldg:cdp_1 .
+bldg:cdp1_power        a brick:Electric_Power_Sensor ; rdfs:label "CDP-1 Power (kW)"        ; brick:isPointOf bldg:cdp_1 .
+
+bldg:cdp_2 a brick:Condenser_Water_Pump ;
+    rdfs:label "Condenser Water Pump CDP-2" ;
+    brick:isPartOf bldg:building ;
+    brick:hasPoint
+        bldg:cdp2_status_read , bldg:cdp2_status_write , bldg:cdp2_alarm ,
+        bldg:cdp2_freq_read , bldg:cdp2_freq_write , bldg:cdp2_power .
+
+bldg:cdp2_status_read  a brick:On_Off_Status    ; rdfs:label "CDP-2 Running Status"         ; brick:isPointOf bldg:cdp_2 .
+bldg:cdp2_status_write a brick:On_Off_Command   ; rdfs:label "CDP-2 Start/Stop Command"     ; brick:isPointOf bldg:cdp_2 .
+bldg:cdp2_alarm        a brick:Alarm            ; rdfs:label "CDP-2 Alarm Status"           ; brick:isPointOf bldg:cdp_2 .
+bldg:cdp2_freq_read    a brick:Frequency_Sensor ; rdfs:label "CDP-2 VSD Frequency (Hz)"     ; brick:isPointOf bldg:cdp_2 .
+bldg:cdp2_freq_write   a brick:Frequency_Command; rdfs:label "CDP-2 VSD Freq Command (Hz)"  ; brick:isPointOf bldg:cdp_2 .
+bldg:cdp2_power        a brick:Electric_Power_Sensor ; rdfs:label "CDP-2 Power (kW)"        ; brick:isPointOf bldg:cdp_2 .
+
+bldg:cdp_3 a brick:Condenser_Water_Pump ;
+    rdfs:label "Condenser Water Pump CDP-3" ;
+    brick:isPartOf bldg:building ;
+    brick:hasPoint
+        bldg:cdp3_status_read , bldg:cdp3_status_write , bldg:cdp3_alarm ,
+        bldg:cdp3_freq_read , bldg:cdp3_freq_write , bldg:cdp3_power .
+
+bldg:cdp3_status_read  a brick:On_Off_Status    ; rdfs:label "CDP-3 Running Status"         ; brick:isPointOf bldg:cdp_3 .
+bldg:cdp3_status_write a brick:On_Off_Command   ; rdfs:label "CDP-3 Start/Stop Command"     ; brick:isPointOf bldg:cdp_3 .
+bldg:cdp3_alarm        a brick:Alarm            ; rdfs:label "CDP-3 Alarm Status"           ; brick:isPointOf bldg:cdp_3 .
+bldg:cdp3_freq_read    a brick:Frequency_Sensor ; rdfs:label "CDP-3 VSD Frequency (Hz)"     ; brick:isPointOf bldg:cdp_3 .
+bldg:cdp3_freq_write   a brick:Frequency_Command; rdfs:label "CDP-3 VSD Freq Command (Hz)"  ; brick:isPointOf bldg:cdp_3 .
+bldg:cdp3_power        a brick:Electric_Power_Sensor ; rdfs:label "CDP-3 Power (kW)"        ; brick:isPointOf bldg:cdp_3 .
+
+# =============================================================================
+# SECTION 5: COOLING TOWERS — CT-1, CT-2, CT-3 (Modbus TCP, VSD, 2 cells each)
+# =============================================================================
+
+bldg:cooling_tower_1 a brick:Cooling_Tower ;
+    rdfs:label "Cooling Tower CT-1 (2 cells)" ;
+    brick:isPartOf bldg:building ;
+    brick:hasPoint
+        bldg:ct1_status_read , bldg:ct1_status_write , bldg:ct1_alarm ,
+        bldg:ct1_freq_read , bldg:ct1_freq_write , bldg:ct1_power .
+
+bldg:ct1_status_read  a brick:On_Off_Status    ; rdfs:label "CT-1 Running Status"         ; brick:isPointOf bldg:cooling_tower_1 .
+bldg:ct1_status_write a brick:On_Off_Command   ; rdfs:label "CT-1 Start/Stop Command"     ; brick:isPointOf bldg:cooling_tower_1 .
+bldg:ct1_alarm        a brick:Alarm            ; rdfs:label "CT-1 Alarm Status"           ; brick:isPointOf bldg:cooling_tower_1 .
+bldg:ct1_freq_read    a brick:Frequency_Sensor ; rdfs:label "CT-1 VSD Frequency (Hz)"     ; brick:isPointOf bldg:cooling_tower_1 .
+bldg:ct1_freq_write   a brick:Frequency_Command; rdfs:label "CT-1 VSD Freq Command (Hz)"  ; brick:isPointOf bldg:cooling_tower_1 .
+bldg:ct1_power        a brick:Electric_Power_Sensor ; rdfs:label "CT-1 Power (kW)"        ; brick:isPointOf bldg:cooling_tower_1 .
+
+bldg:cooling_tower_2 a brick:Cooling_Tower ;
+    rdfs:label "Cooling Tower CT-2 (2 cells)" ;
+    brick:isPartOf bldg:building ;
+    brick:hasPoint
+        bldg:ct2_status_read , bldg:ct2_status_write , bldg:ct2_alarm ,
+        bldg:ct2_freq_read , bldg:ct2_freq_write , bldg:ct2_power .
+
+bldg:ct2_status_read  a brick:On_Off_Status    ; rdfs:label "CT-2 Running Status"         ; brick:isPointOf bldg:cooling_tower_2 .
+bldg:ct2_status_write a brick:On_Off_Command   ; rdfs:label "CT-2 Start/Stop Command"     ; brick:isPointOf bldg:cooling_tower_2 .
+bldg:ct2_alarm        a brick:Alarm            ; rdfs:label "CT-2 Alarm Status"           ; brick:isPointOf bldg:cooling_tower_2 .
+bldg:ct2_freq_read    a brick:Frequency_Sensor ; rdfs:label "CT-2 VSD Frequency (Hz)"     ; brick:isPointOf bldg:cooling_tower_2 .
+bldg:ct2_freq_write   a brick:Frequency_Command; rdfs:label "CT-2 VSD Freq Command (Hz)"  ; brick:isPointOf bldg:cooling_tower_2 .
+bldg:ct2_power        a brick:Electric_Power_Sensor ; rdfs:label "CT-2 Power (kW)"        ; brick:isPointOf bldg:cooling_tower_2 .
+
+bldg:cooling_tower_3 a brick:Cooling_Tower ;
+    rdfs:label "Cooling Tower CT-3 (2 cells)" ;
+    brick:isPartOf bldg:building ;
+    brick:hasPoint
+        bldg:ct3_status_read , bldg:ct3_status_write , bldg:ct3_alarm ,
+        bldg:ct3_freq_read , bldg:ct3_freq_write , bldg:ct3_power .
+
+bldg:ct3_status_read  a brick:On_Off_Status    ; rdfs:label "CT-3 Running Status"         ; brick:isPointOf bldg:cooling_tower_3 .
+bldg:ct3_status_write a brick:On_Off_Command   ; rdfs:label "CT-3 Start/Stop Command"     ; brick:isPointOf bldg:cooling_tower_3 .
+bldg:ct3_alarm        a brick:Alarm            ; rdfs:label "CT-3 Alarm Status"           ; brick:isPointOf bldg:cooling_tower_3 .
+bldg:ct3_freq_read    a brick:Frequency_Sensor ; rdfs:label "CT-3 VSD Frequency (Hz)"     ; brick:isPointOf bldg:cooling_tower_3 .
+bldg:ct3_freq_write   a brick:Frequency_Command; rdfs:label "CT-3 VSD Freq Command (Hz)"  ; brick:isPointOf bldg:cooling_tower_3 .
+bldg:ct3_power        a brick:Electric_Power_Sensor ; rdfs:label "CT-3 Power (kW)"        ; brick:isPointOf bldg:cooling_tower_3 .
+
+# =============================================================================
+# SECTION 6: AIR HANDLING UNITS — AHU-F1 through AHU-F4 (BACnet/IP, 1/floor)
+# =============================================================================
+
+bldg:ahu_f1 a brick:AHU ;
+    rdfs:label "Air Handling Unit AHU-F1 (Floor 1)" ;
+    brick:isPartOf bldg:floor_1 ;
+    brick:feeds bldg:zone_1A , bldg:zone_1B , bldg:zone_1C , bldg:zone_1D ;
+    brick:hasPoint
+        bldg:ahu_f1_room_temp , bldg:ahu_f1_setpoint ,
+        bldg:ahu_f1_status_read , bldg:ahu_f1_status_write ,
+        bldg:ahu_f1_humidity , bldg:ahu_f1_alarm , bldg:ahu_f1_power .
+
+bldg:ahu_f1_room_temp    a brick:Zone_Air_Temperature_Sensor   ; rdfs:label "AHU-F1 Room Temperature (°C)"    ; brick:isPointOf bldg:ahu_f1 .
+bldg:ahu_f1_setpoint     a brick:Zone_Air_Temperature_Setpoint ; rdfs:label "AHU-F1 Temperature Setpoint (°C)"; brick:isPointOf bldg:ahu_f1 .
+bldg:ahu_f1_status_read  a brick:On_Off_Status                 ; rdfs:label "AHU-F1 Running Status"           ; brick:isPointOf bldg:ahu_f1 .
+bldg:ahu_f1_status_write a brick:On_Off_Command                ; rdfs:label "AHU-F1 Start/Stop Command"       ; brick:isPointOf bldg:ahu_f1 .
+bldg:ahu_f1_humidity     a brick:Zone_Air_Humidity_Sensor      ; rdfs:label "AHU-F1 Zone Humidity (%RH)"       ; brick:isPointOf bldg:ahu_f1 .
+bldg:ahu_f1_alarm        a brick:Alarm                         ; rdfs:label "AHU-F1 Alarm Status"             ; brick:isPointOf bldg:ahu_f1 .
+bldg:ahu_f1_power        a brick:Electric_Power_Sensor         ; rdfs:label "AHU-F1 Power (kW)"               ; brick:isPointOf bldg:ahu_f1 .
+
+bldg:ahu_f2 a brick:AHU ;
+    rdfs:label "Air Handling Unit AHU-F2 (Floor 2)" ;
+    brick:isPartOf bldg:floor_2 ;
+    brick:feeds bldg:zone_2A , bldg:zone_2B , bldg:zone_2C , bldg:zone_2D ;
+    brick:hasPoint
+        bldg:ahu_f2_room_temp , bldg:ahu_f2_setpoint ,
+        bldg:ahu_f2_status_read , bldg:ahu_f2_status_write ,
+        bldg:ahu_f2_humidity , bldg:ahu_f2_alarm , bldg:ahu_f2_power .
+
+bldg:ahu_f2_room_temp    a brick:Zone_Air_Temperature_Sensor   ; rdfs:label "AHU-F2 Room Temperature (°C)"    ; brick:isPointOf bldg:ahu_f2 .
+bldg:ahu_f2_setpoint     a brick:Zone_Air_Temperature_Setpoint ; rdfs:label "AHU-F2 Temperature Setpoint (°C)"; brick:isPointOf bldg:ahu_f2 .
+bldg:ahu_f2_status_read  a brick:On_Off_Status                 ; rdfs:label "AHU-F2 Running Status"           ; brick:isPointOf bldg:ahu_f2 .
+bldg:ahu_f2_status_write a brick:On_Off_Command                ; rdfs:label "AHU-F2 Start/Stop Command"       ; brick:isPointOf bldg:ahu_f2 .
+bldg:ahu_f2_humidity     a brick:Zone_Air_Humidity_Sensor      ; rdfs:label "AHU-F2 Zone Humidity (%RH)"       ; brick:isPointOf bldg:ahu_f2 .
+bldg:ahu_f2_alarm        a brick:Alarm                         ; rdfs:label "AHU-F2 Alarm Status"             ; brick:isPointOf bldg:ahu_f2 .
+bldg:ahu_f2_power        a brick:Electric_Power_Sensor         ; rdfs:label "AHU-F2 Power (kW)"               ; brick:isPointOf bldg:ahu_f2 .
+
+bldg:ahu_f3 a brick:AHU ;
+    rdfs:label "Air Handling Unit AHU-F3 (Floor 3)" ;
+    brick:isPartOf bldg:floor_3 ;
+    brick:feeds bldg:zone_3A , bldg:zone_3B , bldg:zone_3C , bldg:zone_3D ;
+    brick:hasPoint
+        bldg:ahu_f3_room_temp , bldg:ahu_f3_setpoint ,
+        bldg:ahu_f3_status_read , bldg:ahu_f3_status_write ,
+        bldg:ahu_f3_humidity , bldg:ahu_f3_alarm , bldg:ahu_f3_power .
+
+bldg:ahu_f3_room_temp    a brick:Zone_Air_Temperature_Sensor   ; rdfs:label "AHU-F3 Room Temperature (°C)"    ; brick:isPointOf bldg:ahu_f3 .
+bldg:ahu_f3_setpoint     a brick:Zone_Air_Temperature_Setpoint ; rdfs:label "AHU-F3 Temperature Setpoint (°C)"; brick:isPointOf bldg:ahu_f3 .
+bldg:ahu_f3_status_read  a brick:On_Off_Status                 ; rdfs:label "AHU-F3 Running Status"           ; brick:isPointOf bldg:ahu_f3 .
+bldg:ahu_f3_status_write a brick:On_Off_Command                ; rdfs:label "AHU-F3 Start/Stop Command"       ; brick:isPointOf bldg:ahu_f3 .
+bldg:ahu_f3_humidity     a brick:Zone_Air_Humidity_Sensor      ; rdfs:label "AHU-F3 Zone Humidity (%RH)"       ; brick:isPointOf bldg:ahu_f3 .
+bldg:ahu_f3_alarm        a brick:Alarm                         ; rdfs:label "AHU-F3 Alarm Status"             ; brick:isPointOf bldg:ahu_f3 .
+bldg:ahu_f3_power        a brick:Electric_Power_Sensor         ; rdfs:label "AHU-F3 Power (kW)"               ; brick:isPointOf bldg:ahu_f3 .
+
+bldg:ahu_f4 a brick:AHU ;
+    rdfs:label "Air Handling Unit AHU-F4 (Floor 4)" ;
+    brick:isPartOf bldg:floor_4 ;
+    brick:feeds bldg:zone_4A , bldg:zone_4B , bldg:zone_4C , bldg:zone_4D ;
+    brick:hasPoint
+        bldg:ahu_f4_room_temp , bldg:ahu_f4_setpoint ,
+        bldg:ahu_f4_status_read , bldg:ahu_f4_status_write ,
+        bldg:ahu_f4_humidity , bldg:ahu_f4_alarm , bldg:ahu_f4_power .
+
+bldg:ahu_f4_room_temp    a brick:Zone_Air_Temperature_Sensor   ; rdfs:label "AHU-F4 Room Temperature (°C)"    ; brick:isPointOf bldg:ahu_f4 .
+bldg:ahu_f4_setpoint     a brick:Zone_Air_Temperature_Setpoint ; rdfs:label "AHU-F4 Temperature Setpoint (°C)"; brick:isPointOf bldg:ahu_f4 .
+bldg:ahu_f4_status_read  a brick:On_Off_Status                 ; rdfs:label "AHU-F4 Running Status"           ; brick:isPointOf bldg:ahu_f4 .
+bldg:ahu_f4_status_write a brick:On_Off_Command                ; rdfs:label "AHU-F4 Start/Stop Command"       ; brick:isPointOf bldg:ahu_f4 .
+bldg:ahu_f4_humidity     a brick:Zone_Air_Humidity_Sensor      ; rdfs:label "AHU-F4 Zone Humidity (%RH)"       ; brick:isPointOf bldg:ahu_f4 .
+bldg:ahu_f4_alarm        a brick:Alarm                         ; rdfs:label "AHU-F4 Alarm Status"             ; brick:isPointOf bldg:ahu_f4 .
+bldg:ahu_f4_power        a brick:Electric_Power_Sensor         ; rdfs:label "AHU-F4 Power (kW)"               ; brick:isPointOf bldg:ahu_f4 .
+
+# =============================================================================
+# SECTION 7: VAV BOXES — 16 units (4/floor, BACnet/IP)
+# =============================================================================
+
+# --- Floor 1: VAV-F1-1 through VAV-F1-4 ---
+bldg:vav_f1_1 a brick:VAV ;
+    rdfs:label "VAV-F1-1 (Zone 1A)" ; brick:isPartOf bldg:floor_1 ;
+    brick:feeds bldg:zone_1A ;
+    brick:hasPoint bldg:vav_f1_1_damper_pos , bldg:vav_f1_1_flow , bldg:vav_f1_1_damper_cmd .
+bldg:vav_f1_1_damper_pos a brick:Damper_Position_Sensor  ; rdfs:label "VAV-F1-1 Damper Position (%)"  ; brick:isPointOf bldg:vav_f1_1 .
+bldg:vav_f1_1_flow       a brick:Supply_Air_Flow_Sensor  ; rdfs:label "VAV-F1-1 Air Flow Rate (CFM)"  ; brick:isPointOf bldg:vav_f1_1 .
+bldg:vav_f1_1_damper_cmd a brick:Damper_Position_Command ; rdfs:label "VAV-F1-1 Damper Command (%)"   ; brick:isPointOf bldg:vav_f1_1 .
+
+bldg:vav_f1_2 a brick:VAV ;
+    rdfs:label "VAV-F1-2 (Zone 1B)" ; brick:isPartOf bldg:floor_1 ;
+    brick:feeds bldg:zone_1B ;
+    brick:hasPoint bldg:vav_f1_2_damper_pos , bldg:vav_f1_2_flow , bldg:vav_f1_2_damper_cmd .
+bldg:vav_f1_2_damper_pos a brick:Damper_Position_Sensor  ; rdfs:label "VAV-F1-2 Damper Position (%)"  ; brick:isPointOf bldg:vav_f1_2 .
+bldg:vav_f1_2_flow       a brick:Supply_Air_Flow_Sensor  ; rdfs:label "VAV-F1-2 Air Flow Rate (CFM)"  ; brick:isPointOf bldg:vav_f1_2 .
+bldg:vav_f1_2_damper_cmd a brick:Damper_Position_Command ; rdfs:label "VAV-F1-2 Damper Command (%)"   ; brick:isPointOf bldg:vav_f1_2 .
+
+bldg:vav_f1_3 a brick:VAV ;
+    rdfs:label "VAV-F1-3 (Zone 1C)" ; brick:isPartOf bldg:floor_1 ;
+    brick:feeds bldg:zone_1C ;
+    brick:hasPoint bldg:vav_f1_3_damper_pos , bldg:vav_f1_3_flow , bldg:vav_f1_3_damper_cmd .
+bldg:vav_f1_3_damper_pos a brick:Damper_Position_Sensor  ; rdfs:label "VAV-F1-3 Damper Position (%)"  ; brick:isPointOf bldg:vav_f1_3 .
+bldg:vav_f1_3_flow       a brick:Supply_Air_Flow_Sensor  ; rdfs:label "VAV-F1-3 Air Flow Rate (CFM)"  ; brick:isPointOf bldg:vav_f1_3 .
+bldg:vav_f1_3_damper_cmd a brick:Damper_Position_Command ; rdfs:label "VAV-F1-3 Damper Command (%)"   ; brick:isPointOf bldg:vav_f1_3 .
+
+bldg:vav_f1_4 a brick:VAV ;
+    rdfs:label "VAV-F1-4 (Zone 1D)" ; brick:isPartOf bldg:floor_1 ;
+    brick:feeds bldg:zone_1D ;
+    brick:hasPoint bldg:vav_f1_4_damper_pos , bldg:vav_f1_4_flow , bldg:vav_f1_4_damper_cmd .
+bldg:vav_f1_4_damper_pos a brick:Damper_Position_Sensor  ; rdfs:label "VAV-F1-4 Damper Position (%)"  ; brick:isPointOf bldg:vav_f1_4 .
+bldg:vav_f1_4_flow       a brick:Supply_Air_Flow_Sensor  ; rdfs:label "VAV-F1-4 Air Flow Rate (CFM)"  ; brick:isPointOf bldg:vav_f1_4 .
+bldg:vav_f1_4_damper_cmd a brick:Damper_Position_Command ; rdfs:label "VAV-F1-4 Damper Command (%)"   ; brick:isPointOf bldg:vav_f1_4 .
+
+# --- Floor 2: VAV-F2-1 through VAV-F2-4 ---
+bldg:vav_f2_1 a brick:VAV ; rdfs:label "VAV-F2-1 (Zone 2A)" ; brick:isPartOf bldg:floor_2 ; brick:feeds bldg:zone_2A ; brick:hasPoint bldg:vav_f2_1_damper_pos , bldg:vav_f2_1_flow , bldg:vav_f2_1_damper_cmd .
+bldg:vav_f2_1_damper_pos a brick:Damper_Position_Sensor  ; rdfs:label "VAV-F2-1 Damper Position (%)"  ; brick:isPointOf bldg:vav_f2_1 .
+bldg:vav_f2_1_flow       a brick:Supply_Air_Flow_Sensor  ; rdfs:label "VAV-F2-1 Air Flow Rate (CFM)"  ; brick:isPointOf bldg:vav_f2_1 .
+bldg:vav_f2_1_damper_cmd a brick:Damper_Position_Command ; rdfs:label "VAV-F2-1 Damper Command (%)"   ; brick:isPointOf bldg:vav_f2_1 .
+
+bldg:vav_f2_2 a brick:VAV ; rdfs:label "VAV-F2-2 (Zone 2B)" ; brick:isPartOf bldg:floor_2 ; brick:feeds bldg:zone_2B ; brick:hasPoint bldg:vav_f2_2_damper_pos , bldg:vav_f2_2_flow , bldg:vav_f2_2_damper_cmd .
+bldg:vav_f2_2_damper_pos a brick:Damper_Position_Sensor  ; rdfs:label "VAV-F2-2 Damper Position (%)"  ; brick:isPointOf bldg:vav_f2_2 .
+bldg:vav_f2_2_flow       a brick:Supply_Air_Flow_Sensor  ; rdfs:label "VAV-F2-2 Air Flow Rate (CFM)"  ; brick:isPointOf bldg:vav_f2_2 .
+bldg:vav_f2_2_damper_cmd a brick:Damper_Position_Command ; rdfs:label "VAV-F2-2 Damper Command (%)"   ; brick:isPointOf bldg:vav_f2_2 .
+
+bldg:vav_f2_3 a brick:VAV ; rdfs:label "VAV-F2-3 (Zone 2C)" ; brick:isPartOf bldg:floor_2 ; brick:feeds bldg:zone_2C ; brick:hasPoint bldg:vav_f2_3_damper_pos , bldg:vav_f2_3_flow , bldg:vav_f2_3_damper_cmd .
+bldg:vav_f2_3_damper_pos a brick:Damper_Position_Sensor  ; rdfs:label "VAV-F2-3 Damper Position (%)"  ; brick:isPointOf bldg:vav_f2_3 .
+bldg:vav_f2_3_flow       a brick:Supply_Air_Flow_Sensor  ; rdfs:label "VAV-F2-3 Air Flow Rate (CFM)"  ; brick:isPointOf bldg:vav_f2_3 .
+bldg:vav_f2_3_damper_cmd a brick:Damper_Position_Command ; rdfs:label "VAV-F2-3 Damper Command (%)"   ; brick:isPointOf bldg:vav_f2_3 .
+
+bldg:vav_f2_4 a brick:VAV ; rdfs:label "VAV-F2-4 (Zone 2D)" ; brick:isPartOf bldg:floor_2 ; brick:feeds bldg:zone_2D ; brick:hasPoint bldg:vav_f2_4_damper_pos , bldg:vav_f2_4_flow , bldg:vav_f2_4_damper_cmd .
+bldg:vav_f2_4_damper_pos a brick:Damper_Position_Sensor  ; rdfs:label "VAV-F2-4 Damper Position (%)"  ; brick:isPointOf bldg:vav_f2_4 .
+bldg:vav_f2_4_flow       a brick:Supply_Air_Flow_Sensor  ; rdfs:label "VAV-F2-4 Air Flow Rate (CFM)"  ; brick:isPointOf bldg:vav_f2_4 .
+bldg:vav_f2_4_damper_cmd a brick:Damper_Position_Command ; rdfs:label "VAV-F2-4 Damper Command (%)"   ; brick:isPointOf bldg:vav_f2_4 .
+
+# --- Floor 3: VAV-F3-1 through VAV-F3-4 ---
+bldg:vav_f3_1 a brick:VAV ; rdfs:label "VAV-F3-1 (Zone 3A)" ; brick:isPartOf bldg:floor_3 ; brick:feeds bldg:zone_3A ; brick:hasPoint bldg:vav_f3_1_damper_pos , bldg:vav_f3_1_flow , bldg:vav_f3_1_damper_cmd .
+bldg:vav_f3_1_damper_pos a brick:Damper_Position_Sensor  ; rdfs:label "VAV-F3-1 Damper Position (%)"  ; brick:isPointOf bldg:vav_f3_1 .
+bldg:vav_f3_1_flow       a brick:Supply_Air_Flow_Sensor  ; rdfs:label "VAV-F3-1 Air Flow Rate (CFM)"  ; brick:isPointOf bldg:vav_f3_1 .
+bldg:vav_f3_1_damper_cmd a brick:Damper_Position_Command ; rdfs:label "VAV-F3-1 Damper Command (%)"   ; brick:isPointOf bldg:vav_f3_1 .
+
+bldg:vav_f3_2 a brick:VAV ; rdfs:label "VAV-F3-2 (Zone 3B)" ; brick:isPartOf bldg:floor_3 ; brick:feeds bldg:zone_3B ; brick:hasPoint bldg:vav_f3_2_damper_pos , bldg:vav_f3_2_flow , bldg:vav_f3_2_damper_cmd .
+bldg:vav_f3_2_damper_pos a brick:Damper_Position_Sensor  ; rdfs:label "VAV-F3-2 Damper Position (%)"  ; brick:isPointOf bldg:vav_f3_2 .
+bldg:vav_f3_2_flow       a brick:Supply_Air_Flow_Sensor  ; rdfs:label "VAV-F3-2 Air Flow Rate (CFM)"  ; brick:isPointOf bldg:vav_f3_2 .
+bldg:vav_f3_2_damper_cmd a brick:Damper_Position_Command ; rdfs:label "VAV-F3-2 Damper Command (%)"   ; brick:isPointOf bldg:vav_f3_2 .
+
+bldg:vav_f3_3 a brick:VAV ; rdfs:label "VAV-F3-3 (Zone 3C)" ; brick:isPartOf bldg:floor_3 ; brick:feeds bldg:zone_3C ; brick:hasPoint bldg:vav_f3_3_damper_pos , bldg:vav_f3_3_flow , bldg:vav_f3_3_damper_cmd .
+bldg:vav_f3_3_damper_pos a brick:Damper_Position_Sensor  ; rdfs:label "VAV-F3-3 Damper Position (%)"  ; brick:isPointOf bldg:vav_f3_3 .
+bldg:vav_f3_3_flow       a brick:Supply_Air_Flow_Sensor  ; rdfs:label "VAV-F3-3 Air Flow Rate (CFM)"  ; brick:isPointOf bldg:vav_f3_3 .
+bldg:vav_f3_3_damper_cmd a brick:Damper_Position_Command ; rdfs:label "VAV-F3-3 Damper Command (%)"   ; brick:isPointOf bldg:vav_f3_3 .
+
+bldg:vav_f3_4 a brick:VAV ; rdfs:label "VAV-F3-4 (Zone 3D)" ; brick:isPartOf bldg:floor_3 ; brick:feeds bldg:zone_3D ; brick:hasPoint bldg:vav_f3_4_damper_pos , bldg:vav_f3_4_flow , bldg:vav_f3_4_damper_cmd .
+bldg:vav_f3_4_damper_pos a brick:Damper_Position_Sensor  ; rdfs:label "VAV-F3-4 Damper Position (%)"  ; brick:isPointOf bldg:vav_f3_4 .
+bldg:vav_f3_4_flow       a brick:Supply_Air_Flow_Sensor  ; rdfs:label "VAV-F3-4 Air Flow Rate (CFM)"  ; brick:isPointOf bldg:vav_f3_4 .
+bldg:vav_f3_4_damper_cmd a brick:Damper_Position_Command ; rdfs:label "VAV-F3-4 Damper Command (%)"   ; brick:isPointOf bldg:vav_f3_4 .
+
+# --- Floor 4: VAV-F4-1 through VAV-F4-4 ---
+bldg:vav_f4_1 a brick:VAV ; rdfs:label "VAV-F4-1 (Zone 4A)" ; brick:isPartOf bldg:floor_4 ; brick:feeds bldg:zone_4A ; brick:hasPoint bldg:vav_f4_1_damper_pos , bldg:vav_f4_1_flow , bldg:vav_f4_1_damper_cmd .
+bldg:vav_f4_1_damper_pos a brick:Damper_Position_Sensor  ; rdfs:label "VAV-F4-1 Damper Position (%)"  ; brick:isPointOf bldg:vav_f4_1 .
+bldg:vav_f4_1_flow       a brick:Supply_Air_Flow_Sensor  ; rdfs:label "VAV-F4-1 Air Flow Rate (CFM)"  ; brick:isPointOf bldg:vav_f4_1 .
+bldg:vav_f4_1_damper_cmd a brick:Damper_Position_Command ; rdfs:label "VAV-F4-1 Damper Command (%)"   ; brick:isPointOf bldg:vav_f4_1 .
+
+bldg:vav_f4_2 a brick:VAV ; rdfs:label "VAV-F4-2 (Zone 4B)" ; brick:isPartOf bldg:floor_4 ; brick:feeds bldg:zone_4B ; brick:hasPoint bldg:vav_f4_2_damper_pos , bldg:vav_f4_2_flow , bldg:vav_f4_2_damper_cmd .
+bldg:vav_f4_2_damper_pos a brick:Damper_Position_Sensor  ; rdfs:label "VAV-F4-2 Damper Position (%)"  ; brick:isPointOf bldg:vav_f4_2 .
+bldg:vav_f4_2_flow       a brick:Supply_Air_Flow_Sensor  ; rdfs:label "VAV-F4-2 Air Flow Rate (CFM)"  ; brick:isPointOf bldg:vav_f4_2 .
+bldg:vav_f4_2_damper_cmd a brick:Damper_Position_Command ; rdfs:label "VAV-F4-2 Damper Command (%)"   ; brick:isPointOf bldg:vav_f4_2 .
+
+bldg:vav_f4_3 a brick:VAV ; rdfs:label "VAV-F4-3 (Zone 4C)" ; brick:isPartOf bldg:floor_4 ; brick:feeds bldg:zone_4C ; brick:hasPoint bldg:vav_f4_3_damper_pos , bldg:vav_f4_3_flow , bldg:vav_f4_3_damper_cmd .
+bldg:vav_f4_3_damper_pos a brick:Damper_Position_Sensor  ; rdfs:label "VAV-F4-3 Damper Position (%)"  ; brick:isPointOf bldg:vav_f4_3 .
+bldg:vav_f4_3_flow       a brick:Supply_Air_Flow_Sensor  ; rdfs:label "VAV-F4-3 Air Flow Rate (CFM)"  ; brick:isPointOf bldg:vav_f4_3 .
+bldg:vav_f4_3_damper_cmd a brick:Damper_Position_Command ; rdfs:label "VAV-F4-3 Damper Command (%)"   ; brick:isPointOf bldg:vav_f4_3 .
+
+bldg:vav_f4_4 a brick:VAV ; rdfs:label "VAV-F4-4 (Zone 4D)" ; brick:isPartOf bldg:floor_4 ; brick:feeds bldg:zone_4D ; brick:hasPoint bldg:vav_f4_4_damper_pos , bldg:vav_f4_4_flow , bldg:vav_f4_4_damper_cmd .
+bldg:vav_f4_4_damper_pos a brick:Damper_Position_Sensor  ; rdfs:label "VAV-F4-4 Damper Position (%)"  ; brick:isPointOf bldg:vav_f4_4 .
+bldg:vav_f4_4_flow       a brick:Supply_Air_Flow_Sensor  ; rdfs:label "VAV-F4-4 Air Flow Rate (CFM)"  ; brick:isPointOf bldg:vav_f4_4 .
+bldg:vav_f4_4_damper_cmd a brick:Damper_Position_Command ; rdfs:label "VAV-F4-4 Damper Command (%)"   ; brick:isPointOf bldg:vav_f4_4 .
+
+# AHU→VAV feeds (chilled air supply chain)
+bldg:ahu_f1 brick:feeds bldg:vav_f1_1 , bldg:vav_f1_2 , bldg:vav_f1_3 , bldg:vav_f1_4 .
+bldg:ahu_f2 brick:feeds bldg:vav_f2_1 , bldg:vav_f2_2 , bldg:vav_f2_3 , bldg:vav_f2_4 .
+bldg:ahu_f3 brick:feeds bldg:vav_f3_1 , bldg:vav_f3_2 , bldg:vav_f3_3 , bldg:vav_f3_4 .
+bldg:ahu_f4 brick:feeds bldg:vav_f4_1 , bldg:vav_f4_2 , bldg:vav_f4_3 , bldg:vav_f4_4 .
+
+# =============================================================================
+# SECTION 8: IAQ SENSORS — 8 units (2/floor, MQTT)
+# =============================================================================
+
+bldg:iaq_f1a a brick:Air_Quality_Sensor ;
+    rdfs:label "IAQ Sensor Floor 1 Zone A" ;
+    brick:isPartOf bldg:zone_1A ;
+    brick:hasPoint bldg:iaq_f1a_temp , bldg:iaq_f1a_humidity , bldg:iaq_f1a_co2 , bldg:iaq_f1a_pm25 .
+bldg:iaq_f1a_temp     a brick:Zone_Air_Temperature_Sensor ; rdfs:label "IAQ-F1A Temperature (°C)"    ; brick:isPointOf bldg:iaq_f1a .
+bldg:iaq_f1a_humidity a brick:Zone_Air_Humidity_Sensor    ; rdfs:label "IAQ-F1A Humidity (%RH)"       ; brick:isPointOf bldg:iaq_f1a .
+bldg:iaq_f1a_co2      a brick:CO2_Sensor                  ; rdfs:label "IAQ-F1A CO₂ (ppm)"            ; brick:isPointOf bldg:iaq_f1a .
+bldg:iaq_f1a_pm25     a brick:PM2.5_Sensor                ; rdfs:label "IAQ-F1A PM2.5 (µg/m³)"        ; brick:isPointOf bldg:iaq_f1a .
+
+bldg:iaq_f1b a brick:Air_Quality_Sensor ;
+    rdfs:label "IAQ Sensor Floor 1 Zone B" ;
+    brick:isPartOf bldg:zone_1B ;
+    brick:hasPoint bldg:iaq_f1b_temp , bldg:iaq_f1b_humidity , bldg:iaq_f1b_co2 , bldg:iaq_f1b_pm25 .
+bldg:iaq_f1b_temp     a brick:Zone_Air_Temperature_Sensor ; rdfs:label "IAQ-F1B Temperature (°C)"    ; brick:isPointOf bldg:iaq_f1b .
+bldg:iaq_f1b_humidity a brick:Zone_Air_Humidity_Sensor    ; rdfs:label "IAQ-F1B Humidity (%RH)"       ; brick:isPointOf bldg:iaq_f1b .
+bldg:iaq_f1b_co2      a brick:CO2_Sensor                  ; rdfs:label "IAQ-F1B CO₂ (ppm)"            ; brick:isPointOf bldg:iaq_f1b .
+bldg:iaq_f1b_pm25     a brick:PM2.5_Sensor                ; rdfs:label "IAQ-F1B PM2.5 (µg/m³)"        ; brick:isPointOf bldg:iaq_f1b .
+
+bldg:iaq_f2a a brick:Air_Quality_Sensor ;
+    rdfs:label "IAQ Sensor Floor 2 Zone A" ;
+    brick:isPartOf bldg:zone_2A ;
+    brick:hasPoint bldg:iaq_f2a_temp , bldg:iaq_f2a_humidity , bldg:iaq_f2a_co2 , bldg:iaq_f2a_pm25 .
+bldg:iaq_f2a_temp     a brick:Zone_Air_Temperature_Sensor ; rdfs:label "IAQ-F2A Temperature (°C)"    ; brick:isPointOf bldg:iaq_f2a .
+bldg:iaq_f2a_humidity a brick:Zone_Air_Humidity_Sensor    ; rdfs:label "IAQ-F2A Humidity (%RH)"       ; brick:isPointOf bldg:iaq_f2a .
+bldg:iaq_f2a_co2      a brick:CO2_Sensor                  ; rdfs:label "IAQ-F2A CO₂ (ppm)"            ; brick:isPointOf bldg:iaq_f2a .
+bldg:iaq_f2a_pm25     a brick:PM2.5_Sensor                ; rdfs:label "IAQ-F2A PM2.5 (µg/m³)"        ; brick:isPointOf bldg:iaq_f2a .
+
+bldg:iaq_f2b a brick:Air_Quality_Sensor ;
+    rdfs:label "IAQ Sensor Floor 2 Zone B" ;
+    brick:isPartOf bldg:zone_2B ;
+    brick:hasPoint bldg:iaq_f2b_temp , bldg:iaq_f2b_humidity , bldg:iaq_f2b_co2 , bldg:iaq_f2b_pm25 .
+bldg:iaq_f2b_temp     a brick:Zone_Air_Temperature_Sensor ; rdfs:label "IAQ-F2B Temperature (°C)"    ; brick:isPointOf bldg:iaq_f2b .
+bldg:iaq_f2b_humidity a brick:Zone_Air_Humidity_Sensor    ; rdfs:label "IAQ-F2B Humidity (%RH)"       ; brick:isPointOf bldg:iaq_f2b .
+bldg:iaq_f2b_co2      a brick:CO2_Sensor                  ; rdfs:label "IAQ-F2B CO₂ (ppm)"            ; brick:isPointOf bldg:iaq_f2b .
+bldg:iaq_f2b_pm25     a brick:PM2.5_Sensor                ; rdfs:label "IAQ-F2B PM2.5 (µg/m³)"        ; brick:isPointOf bldg:iaq_f2b .
+
+bldg:iaq_f3a a brick:Air_Quality_Sensor ;
+    rdfs:label "IAQ Sensor Floor 3 Zone A" ;
+    brick:isPartOf bldg:zone_3A ;
+    brick:hasPoint bldg:iaq_f3a_temp , bldg:iaq_f3a_humidity , bldg:iaq_f3a_co2 , bldg:iaq_f3a_pm25 .
+bldg:iaq_f3a_temp     a brick:Zone_Air_Temperature_Sensor ; rdfs:label "IAQ-F3A Temperature (°C)"    ; brick:isPointOf bldg:iaq_f3a .
+bldg:iaq_f3a_humidity a brick:Zone_Air_Humidity_Sensor    ; rdfs:label "IAQ-F3A Humidity (%RH)"       ; brick:isPointOf bldg:iaq_f3a .
+bldg:iaq_f3a_co2      a brick:CO2_Sensor                  ; rdfs:label "IAQ-F3A CO₂ (ppm)"            ; brick:isPointOf bldg:iaq_f3a .
+bldg:iaq_f3a_pm25     a brick:PM2.5_Sensor                ; rdfs:label "IAQ-F3A PM2.5 (µg/m³)"        ; brick:isPointOf bldg:iaq_f3a .
+
+bldg:iaq_f3b a brick:Air_Quality_Sensor ;
+    rdfs:label "IAQ Sensor Floor 3 Zone B" ;
+    brick:isPartOf bldg:zone_3B ;
+    brick:hasPoint bldg:iaq_f3b_temp , bldg:iaq_f3b_humidity , bldg:iaq_f3b_co2 , bldg:iaq_f3b_pm25 .
+bldg:iaq_f3b_temp     a brick:Zone_Air_Temperature_Sensor ; rdfs:label "IAQ-F3B Temperature (°C)"    ; brick:isPointOf bldg:iaq_f3b .
+bldg:iaq_f3b_humidity a brick:Zone_Air_Humidity_Sensor    ; rdfs:label "IAQ-F3B Humidity (%RH)"       ; brick:isPointOf bldg:iaq_f3b .
+bldg:iaq_f3b_co2      a brick:CO2_Sensor                  ; rdfs:label "IAQ-F3B CO₂ (ppm)"            ; brick:isPointOf bldg:iaq_f3b .
+bldg:iaq_f3b_pm25     a brick:PM2.5_Sensor                ; rdfs:label "IAQ-F3B PM2.5 (µg/m³)"        ; brick:isPointOf bldg:iaq_f3b .
+
+bldg:iaq_f4a a brick:Air_Quality_Sensor ;
+    rdfs:label "IAQ Sensor Floor 4 Zone A" ;
+    brick:isPartOf bldg:zone_4A ;
+    brick:hasPoint bldg:iaq_f4a_temp , bldg:iaq_f4a_humidity , bldg:iaq_f4a_co2 , bldg:iaq_f4a_pm25 .
+bldg:iaq_f4a_temp     a brick:Zone_Air_Temperature_Sensor ; rdfs:label "IAQ-F4A Temperature (°C)"    ; brick:isPointOf bldg:iaq_f4a .
+bldg:iaq_f4a_humidity a brick:Zone_Air_Humidity_Sensor    ; rdfs:label "IAQ-F4A Humidity (%RH)"       ; brick:isPointOf bldg:iaq_f4a .
+bldg:iaq_f4a_co2      a brick:CO2_Sensor                  ; rdfs:label "IAQ-F4A CO₂ (ppm)"            ; brick:isPointOf bldg:iaq_f4a .
+bldg:iaq_f4a_pm25     a brick:PM2.5_Sensor                ; rdfs:label "IAQ-F4A PM2.5 (µg/m³)"        ; brick:isPointOf bldg:iaq_f4a .
+
+bldg:iaq_f4b a brick:Air_Quality_Sensor ;
+    rdfs:label "IAQ Sensor Floor 4 Zone B" ;
+    brick:isPartOf bldg:zone_4B ;
+    brick:hasPoint bldg:iaq_f4b_temp , bldg:iaq_f4b_humidity , bldg:iaq_f4b_co2 , bldg:iaq_f4b_pm25 .
+bldg:iaq_f4b_temp     a brick:Zone_Air_Temperature_Sensor ; rdfs:label "IAQ-F4B Temperature (°C)"    ; brick:isPointOf bldg:iaq_f4b .
+bldg:iaq_f4b_humidity a brick:Zone_Air_Humidity_Sensor    ; rdfs:label "IAQ-F4B Humidity (%RH)"       ; brick:isPointOf bldg:iaq_f4b .
+bldg:iaq_f4b_co2      a brick:CO2_Sensor                  ; rdfs:label "IAQ-F4B CO₂ (ppm)"            ; brick:isPointOf bldg:iaq_f4b .
+bldg:iaq_f4b_pm25     a brick:PM2.5_Sensor                ; rdfs:label "IAQ-F4B PM2.5 (µg/m³)"        ; brick:isPointOf bldg:iaq_f4b .
+
+# =============================================================================
+# SECTION 9: OUTDOOR WEATHER STATION — WS-ROOF (MQTT)
+# =============================================================================
+
+bldg:weather_station a brick:Weather_Station ;
+    rdfs:label "Outdoor Weather Station (Rooftop)" ;
+    brick:isPartOf bldg:building ;
+    brick:hasPoint
+        bldg:ws_drybulb_temp ,
+        bldg:ws_humidity ,
+        bldg:ws_wetbulb_temp .
+
+bldg:ws_drybulb_temp  a brick:Outside_Air_Temperature_Sensor ; rdfs:label "Weather Station Dry-Bulb Temp (°C)" ; brick:isPointOf bldg:weather_station .
+bldg:ws_humidity      a brick:Outside_Air_Humidity_Sensor    ; rdfs:label "Weather Station Humidity (%RH)"     ; brick:isPointOf bldg:weather_station .
+bldg:ws_wetbulb_temp  a brick:Wet_Bulb_Temperature_Sensor    ; rdfs:label "Weather Station Wet-Bulb Temp (°C)" ; brick:isPointOf bldg:weather_station .
+
+# =============================================================================
+# SECTION 10: ELECTRICAL METERING — 21 meters total (Modbus TCP)
+# 5 data points each: voltage_LL_average, current, power, energy, power_factor
+# =============================================================================
+
+# --- Main Building Meter ---
+bldg:pm_main a brick:Building_Electrical_Meter ;
+    rdfs:label "Main Building Power Meter (PM-MAIN)" ;
+    brick:isPartOf bldg:building ;
+    brick:hasPoint
+        bldg:pm_main_voltage , bldg:pm_main_current ,
+        bldg:pm_main_power , bldg:pm_main_energy , bldg:pm_main_pf .
+
+bldg:pm_main_voltage a brick:Voltage_Sensor      ; rdfs:label "PM-MAIN Voltage LL Avg (V)"    ; brick:isPointOf bldg:pm_main .
+bldg:pm_main_current a brick:Current_Sensor      ; rdfs:label "PM-MAIN Total Current (A)"      ; brick:isPointOf bldg:pm_main .
+bldg:pm_main_power   a brick:Electric_Power_Sensor ; rdfs:label "PM-MAIN Active Power (kW)"   ; brick:isPointOf bldg:pm_main .
+bldg:pm_main_energy  a brick:Electric_Energy_Sensor; rdfs:label "PM-MAIN Energy (kWh)"         ; brick:isPointOf bldg:pm_main .
+bldg:pm_main_pf      a brick:Power_Factor_Sensor  ; rdfs:label "PM-MAIN Power Factor"          ; brick:isPointOf bldg:pm_main .
+
+# --- Floor Sub-Meters ---
+bldg:pm_f1 a brick:Electrical_Meter ;
+    rdfs:label "Floor 1 Sub-Meter (PM-F1)" ;
+    brick:meters bldg:floor_1 ;
+    brick:hasPoint bldg:pm_f1_voltage , bldg:pm_f1_current , bldg:pm_f1_power , bldg:pm_f1_energy , bldg:pm_f1_pf .
+bldg:pm_f1_voltage a brick:Voltage_Sensor       ; rdfs:label "PM-F1 Voltage LL Avg (V)" ; brick:isPointOf bldg:pm_f1 .
+bldg:pm_f1_current a brick:Current_Sensor       ; rdfs:label "PM-F1 Total Current (A)"  ; brick:isPointOf bldg:pm_f1 .
+bldg:pm_f1_power   a brick:Electric_Power_Sensor; rdfs:label "PM-F1 Active Power (kW)"  ; brick:isPointOf bldg:pm_f1 .
+bldg:pm_f1_energy  a brick:Electric_Energy_Sensor;rdfs:label "PM-F1 Energy (kWh)"        ; brick:isPointOf bldg:pm_f1 .
+bldg:pm_f1_pf      a brick:Power_Factor_Sensor  ; rdfs:label "PM-F1 Power Factor"        ; brick:isPointOf bldg:pm_f1 .
+
+bldg:pm_f2 a brick:Electrical_Meter ;
+    rdfs:label "Floor 2 Sub-Meter (PM-F2)" ;
+    brick:meters bldg:floor_2 ;
+    brick:hasPoint bldg:pm_f2_voltage , bldg:pm_f2_current , bldg:pm_f2_power , bldg:pm_f2_energy , bldg:pm_f2_pf .
+bldg:pm_f2_voltage a brick:Voltage_Sensor       ; rdfs:label "PM-F2 Voltage LL Avg (V)" ; brick:isPointOf bldg:pm_f2 .
+bldg:pm_f2_current a brick:Current_Sensor       ; rdfs:label "PM-F2 Total Current (A)"  ; brick:isPointOf bldg:pm_f2 .
+bldg:pm_f2_power   a brick:Electric_Power_Sensor; rdfs:label "PM-F2 Active Power (kW)"  ; brick:isPointOf bldg:pm_f2 .
+bldg:pm_f2_energy  a brick:Electric_Energy_Sensor;rdfs:label "PM-F2 Energy (kWh)"        ; brick:isPointOf bldg:pm_f2 .
+bldg:pm_f2_pf      a brick:Power_Factor_Sensor  ; rdfs:label "PM-F2 Power Factor"        ; brick:isPointOf bldg:pm_f2 .
+
+bldg:pm_f3 a brick:Electrical_Meter ;
+    rdfs:label "Floor 3 Sub-Meter (PM-F3)" ;
+    brick:meters bldg:floor_3 ;
+    brick:hasPoint bldg:pm_f3_voltage , bldg:pm_f3_current , bldg:pm_f3_power , bldg:pm_f3_energy , bldg:pm_f3_pf .
+bldg:pm_f3_voltage a brick:Voltage_Sensor       ; rdfs:label "PM-F3 Voltage LL Avg (V)" ; brick:isPointOf bldg:pm_f3 .
+bldg:pm_f3_current a brick:Current_Sensor       ; rdfs:label "PM-F3 Total Current (A)"  ; brick:isPointOf bldg:pm_f3 .
+bldg:pm_f3_power   a brick:Electric_Power_Sensor; rdfs:label "PM-F3 Active Power (kW)"  ; brick:isPointOf bldg:pm_f3 .
+bldg:pm_f3_energy  a brick:Electric_Energy_Sensor;rdfs:label "PM-F3 Energy (kWh)"        ; brick:isPointOf bldg:pm_f3 .
+bldg:pm_f3_pf      a brick:Power_Factor_Sensor  ; rdfs:label "PM-F3 Power Factor"        ; brick:isPointOf bldg:pm_f3 .
+
+bldg:pm_f4 a brick:Electrical_Meter ;
+    rdfs:label "Floor 4 Sub-Meter (PM-F4)" ;
+    brick:meters bldg:floor_4 ;
+    brick:hasPoint bldg:pm_f4_voltage , bldg:pm_f4_current , bldg:pm_f4_power , bldg:pm_f4_energy , bldg:pm_f4_pf .
+bldg:pm_f4_voltage a brick:Voltage_Sensor       ; rdfs:label "PM-F4 Voltage LL Avg (V)" ; brick:isPointOf bldg:pm_f4 .
+bldg:pm_f4_current a brick:Current_Sensor       ; rdfs:label "PM-F4 Total Current (A)"  ; brick:isPointOf bldg:pm_f4 .
+bldg:pm_f4_power   a brick:Electric_Power_Sensor; rdfs:label "PM-F4 Active Power (kW)"  ; brick:isPointOf bldg:pm_f4 .
+bldg:pm_f4_energy  a brick:Electric_Energy_Sensor;rdfs:label "PM-F4 Energy (kWh)"        ; brick:isPointOf bldg:pm_f4 .
+bldg:pm_f4_pf      a brick:Power_Factor_Sensor  ; rdfs:label "PM-F4 Power Factor"        ; brick:isPointOf bldg:pm_f4 .
+
+# --- Chiller Sub-Meters ---
+bldg:pm_ch1 a brick:Electrical_Meter ; rdfs:label "Chiller CH-1 Sub-Meter (PM-CH1)" ; brick:meters bldg:chiller_1 ; brick:hasPoint bldg:pm_ch1_voltage , bldg:pm_ch1_current , bldg:pm_ch1_power , bldg:pm_ch1_energy , bldg:pm_ch1_pf .
+bldg:pm_ch1_voltage a brick:Voltage_Sensor       ; rdfs:label "PM-CH1 Voltage (V)"    ; brick:isPointOf bldg:pm_ch1 .
+bldg:pm_ch1_current a brick:Current_Sensor       ; rdfs:label "PM-CH1 Current (A)"    ; brick:isPointOf bldg:pm_ch1 .
+bldg:pm_ch1_power   a brick:Electric_Power_Sensor; rdfs:label "PM-CH1 Power (kW)"     ; brick:isPointOf bldg:pm_ch1 .
+bldg:pm_ch1_energy  a brick:Electric_Energy_Sensor;rdfs:label "PM-CH1 Energy (kWh)"    ; brick:isPointOf bldg:pm_ch1 .
+bldg:pm_ch1_pf      a brick:Power_Factor_Sensor  ; rdfs:label "PM-CH1 Power Factor"   ; brick:isPointOf bldg:pm_ch1 .
+
+bldg:pm_ch2 a brick:Electrical_Meter ; rdfs:label "Chiller CH-2 Sub-Meter (PM-CH2)" ; brick:meters bldg:chiller_2 ; brick:hasPoint bldg:pm_ch2_voltage , bldg:pm_ch2_current , bldg:pm_ch2_power , bldg:pm_ch2_energy , bldg:pm_ch2_pf .
+bldg:pm_ch2_voltage a brick:Voltage_Sensor       ; rdfs:label "PM-CH2 Voltage (V)"    ; brick:isPointOf bldg:pm_ch2 .
+bldg:pm_ch2_current a brick:Current_Sensor       ; rdfs:label "PM-CH2 Current (A)"    ; brick:isPointOf bldg:pm_ch2 .
+bldg:pm_ch2_power   a brick:Electric_Power_Sensor; rdfs:label "PM-CH2 Power (kW)"     ; brick:isPointOf bldg:pm_ch2 .
+bldg:pm_ch2_energy  a brick:Electric_Energy_Sensor;rdfs:label "PM-CH2 Energy (kWh)"    ; brick:isPointOf bldg:pm_ch2 .
+bldg:pm_ch2_pf      a brick:Power_Factor_Sensor  ; rdfs:label "PM-CH2 Power Factor"   ; brick:isPointOf bldg:pm_ch2 .
+
+bldg:pm_ch3 a brick:Electrical_Meter ; rdfs:label "Chiller CH-3 Sub-Meter (PM-CH3)" ; brick:meters bldg:chiller_3 ; brick:hasPoint bldg:pm_ch3_voltage , bldg:pm_ch3_current , bldg:pm_ch3_power , bldg:pm_ch3_energy , bldg:pm_ch3_pf .
+bldg:pm_ch3_voltage a brick:Voltage_Sensor       ; rdfs:label "PM-CH3 Voltage (V)"    ; brick:isPointOf bldg:pm_ch3 .
+bldg:pm_ch3_current a brick:Current_Sensor       ; rdfs:label "PM-CH3 Current (A)"    ; brick:isPointOf bldg:pm_ch3 .
+bldg:pm_ch3_power   a brick:Electric_Power_Sensor; rdfs:label "PM-CH3 Power (kW)"     ; brick:isPointOf bldg:pm_ch3 .
+bldg:pm_ch3_energy  a brick:Electric_Energy_Sensor;rdfs:label "PM-CH3 Energy (kWh)"    ; brick:isPointOf bldg:pm_ch3 .
+bldg:pm_ch3_pf      a brick:Power_Factor_Sensor  ; rdfs:label "PM-CH3 Power Factor"   ; brick:isPointOf bldg:pm_ch3 .
+
+# --- CHWP Sub-Meters ---
+bldg:pm_chp1 a brick:Electrical_Meter ; rdfs:label "CHWP CHP-1 Sub-Meter (PM-CHP1)" ; brick:meters bldg:chp_1 ; brick:hasPoint bldg:pm_chp1_voltage , bldg:pm_chp1_current , bldg:pm_chp1_power , bldg:pm_chp1_energy , bldg:pm_chp1_pf .
+bldg:pm_chp1_voltage a brick:Voltage_Sensor       ; rdfs:label "PM-CHP1 Voltage (V)"   ; brick:isPointOf bldg:pm_chp1 .
+bldg:pm_chp1_current a brick:Current_Sensor       ; rdfs:label "PM-CHP1 Current (A)"   ; brick:isPointOf bldg:pm_chp1 .
+bldg:pm_chp1_power   a brick:Electric_Power_Sensor; rdfs:label "PM-CHP1 Power (kW)"    ; brick:isPointOf bldg:pm_chp1 .
+bldg:pm_chp1_energy  a brick:Electric_Energy_Sensor;rdfs:label "PM-CHP1 Energy (kWh)"   ; brick:isPointOf bldg:pm_chp1 .
+bldg:pm_chp1_pf      a brick:Power_Factor_Sensor  ; rdfs:label "PM-CHP1 Power Factor"  ; brick:isPointOf bldg:pm_chp1 .
+
+bldg:pm_chp2 a brick:Electrical_Meter ; rdfs:label "CHWP CHP-2 Sub-Meter (PM-CHP2)" ; brick:meters bldg:chp_2 ; brick:hasPoint bldg:pm_chp2_voltage , bldg:pm_chp2_current , bldg:pm_chp2_power , bldg:pm_chp2_energy , bldg:pm_chp2_pf .
+bldg:pm_chp2_voltage a brick:Voltage_Sensor       ; rdfs:label "PM-CHP2 Voltage (V)"   ; brick:isPointOf bldg:pm_chp2 .
+bldg:pm_chp2_current a brick:Current_Sensor       ; rdfs:label "PM-CHP2 Current (A)"   ; brick:isPointOf bldg:pm_chp2 .
+bldg:pm_chp2_power   a brick:Electric_Power_Sensor; rdfs:label "PM-CHP2 Power (kW)"    ; brick:isPointOf bldg:pm_chp2 .
+bldg:pm_chp2_energy  a brick:Electric_Energy_Sensor;rdfs:label "PM-CHP2 Energy (kWh)"   ; brick:isPointOf bldg:pm_chp2 .
+bldg:pm_chp2_pf      a brick:Power_Factor_Sensor  ; rdfs:label "PM-CHP2 Power Factor"  ; brick:isPointOf bldg:pm_chp2 .
+
+bldg:pm_chp3 a brick:Electrical_Meter ; rdfs:label "CHWP CHP-3 Sub-Meter (PM-CHP3)" ; brick:meters bldg:chp_3 ; brick:hasPoint bldg:pm_chp3_voltage , bldg:pm_chp3_current , bldg:pm_chp3_power , bldg:pm_chp3_energy , bldg:pm_chp3_pf .
+bldg:pm_chp3_voltage a brick:Voltage_Sensor       ; rdfs:label "PM-CHP3 Voltage (V)"   ; brick:isPointOf bldg:pm_chp3 .
+bldg:pm_chp3_current a brick:Current_Sensor       ; rdfs:label "PM-CHP3 Current (A)"   ; brick:isPointOf bldg:pm_chp3 .
+bldg:pm_chp3_power   a brick:Electric_Power_Sensor; rdfs:label "PM-CHP3 Power (kW)"    ; brick:isPointOf bldg:pm_chp3 .
+bldg:pm_chp3_energy  a brick:Electric_Energy_Sensor;rdfs:label "PM-CHP3 Energy (kWh)"   ; brick:isPointOf bldg:pm_chp3 .
+bldg:pm_chp3_pf      a brick:Power_Factor_Sensor  ; rdfs:label "PM-CHP3 Power Factor"  ; brick:isPointOf bldg:pm_chp3 .
+
+# --- CDWP Sub-Meters ---
+bldg:pm_cdp1 a brick:Electrical_Meter ; rdfs:label "CDWP CDP-1 Sub-Meter (PM-CDP1)" ; brick:meters bldg:cdp_1 ; brick:hasPoint bldg:pm_cdp1_voltage , bldg:pm_cdp1_current , bldg:pm_cdp1_power , bldg:pm_cdp1_energy , bldg:pm_cdp1_pf .
+bldg:pm_cdp1_voltage a brick:Voltage_Sensor       ; rdfs:label "PM-CDP1 Voltage (V)"   ; brick:isPointOf bldg:pm_cdp1 .
+bldg:pm_cdp1_current a brick:Current_Sensor       ; rdfs:label "PM-CDP1 Current (A)"   ; brick:isPointOf bldg:pm_cdp1 .
+bldg:pm_cdp1_power   a brick:Electric_Power_Sensor; rdfs:label "PM-CDP1 Power (kW)"    ; brick:isPointOf bldg:pm_cdp1 .
+bldg:pm_cdp1_energy  a brick:Electric_Energy_Sensor;rdfs:label "PM-CDP1 Energy (kWh)"   ; brick:isPointOf bldg:pm_cdp1 .
+bldg:pm_cdp1_pf      a brick:Power_Factor_Sensor  ; rdfs:label "PM-CDP1 Power Factor"  ; brick:isPointOf bldg:pm_cdp1 .
+
+bldg:pm_cdp2 a brick:Electrical_Meter ; rdfs:label "CDWP CDP-2 Sub-Meter (PM-CDP2)" ; brick:meters bldg:cdp_2 ; brick:hasPoint bldg:pm_cdp2_voltage , bldg:pm_cdp2_current , bldg:pm_cdp2_power , bldg:pm_cdp2_energy , bldg:pm_cdp2_pf .
+bldg:pm_cdp2_voltage a brick:Voltage_Sensor       ; rdfs:label "PM-CDP2 Voltage (V)"   ; brick:isPointOf bldg:pm_cdp2 .
+bldg:pm_cdp2_current a brick:Current_Sensor       ; rdfs:label "PM-CDP2 Current (A)"   ; brick:isPointOf bldg:pm_cdp2 .
+bldg:pm_cdp2_power   a brick:Electric_Power_Sensor; rdfs:label "PM-CDP2 Power (kW)"    ; brick:isPointOf bldg:pm_cdp2 .
+bldg:pm_cdp2_energy  a brick:Electric_Energy_Sensor;rdfs:label "PM-CDP2 Energy (kWh)"   ; brick:isPointOf bldg:pm_cdp2 .
+bldg:pm_cdp2_pf      a brick:Power_Factor_Sensor  ; rdfs:label "PM-CDP2 Power Factor"  ; brick:isPointOf bldg:pm_cdp2 .
+
+bldg:pm_cdp3 a brick:Electrical_Meter ; rdfs:label "CDWP CDP-3 Sub-Meter (PM-CDP3)" ; brick:meters bldg:cdp_3 ; brick:hasPoint bldg:pm_cdp3_voltage , bldg:pm_cdp3_current , bldg:pm_cdp3_power , bldg:pm_cdp3_energy , bldg:pm_cdp3_pf .
+bldg:pm_cdp3_voltage a brick:Voltage_Sensor       ; rdfs:label "PM-CDP3 Voltage (V)"   ; brick:isPointOf bldg:pm_cdp3 .
+bldg:pm_cdp3_current a brick:Current_Sensor       ; rdfs:label "PM-CDP3 Current (A)"   ; brick:isPointOf bldg:pm_cdp3 .
+bldg:pm_cdp3_power   a brick:Electric_Power_Sensor; rdfs:label "PM-CDP3 Power (kW)"    ; brick:isPointOf bldg:pm_cdp3 .
+bldg:pm_cdp3_energy  a brick:Electric_Energy_Sensor;rdfs:label "PM-CDP3 Energy (kWh)"   ; brick:isPointOf bldg:pm_cdp3 .
+bldg:pm_cdp3_pf      a brick:Power_Factor_Sensor  ; rdfs:label "PM-CDP3 Power Factor"  ; brick:isPointOf bldg:pm_cdp3 .
+
+# --- Cooling Tower Sub-Meters ---
+bldg:pm_ct1 a brick:Electrical_Meter ; rdfs:label "Cooling Tower CT-1 Sub-Meter (PM-CT1)" ; brick:meters bldg:cooling_tower_1 ; brick:hasPoint bldg:pm_ct1_voltage , bldg:pm_ct1_current , bldg:pm_ct1_power , bldg:pm_ct1_energy , bldg:pm_ct1_pf .
+bldg:pm_ct1_voltage a brick:Voltage_Sensor       ; rdfs:label "PM-CT1 Voltage (V)"  ; brick:isPointOf bldg:pm_ct1 .
+bldg:pm_ct1_current a brick:Current_Sensor       ; rdfs:label "PM-CT1 Current (A)"  ; brick:isPointOf bldg:pm_ct1 .
+bldg:pm_ct1_power   a brick:Electric_Power_Sensor; rdfs:label "PM-CT1 Power (kW)"   ; brick:isPointOf bldg:pm_ct1 .
+bldg:pm_ct1_energy  a brick:Electric_Energy_Sensor;rdfs:label "PM-CT1 Energy (kWh)"  ; brick:isPointOf bldg:pm_ct1 .
+bldg:pm_ct1_pf      a brick:Power_Factor_Sensor  ; rdfs:label "PM-CT1 Power Factor" ; brick:isPointOf bldg:pm_ct1 .
+
+bldg:pm_ct2 a brick:Electrical_Meter ; rdfs:label "Cooling Tower CT-2 Sub-Meter (PM-CT2)" ; brick:meters bldg:cooling_tower_2 ; brick:hasPoint bldg:pm_ct2_voltage , bldg:pm_ct2_current , bldg:pm_ct2_power , bldg:pm_ct2_energy , bldg:pm_ct2_pf .
+bldg:pm_ct2_voltage a brick:Voltage_Sensor       ; rdfs:label "PM-CT2 Voltage (V)"  ; brick:isPointOf bldg:pm_ct2 .
+bldg:pm_ct2_current a brick:Current_Sensor       ; rdfs:label "PM-CT2 Current (A)"  ; brick:isPointOf bldg:pm_ct2 .
+bldg:pm_ct2_power   a brick:Electric_Power_Sensor; rdfs:label "PM-CT2 Power (kW)"   ; brick:isPointOf bldg:pm_ct2 .
+bldg:pm_ct2_energy  a brick:Electric_Energy_Sensor;rdfs:label "PM-CT2 Energy (kWh)"  ; brick:isPointOf bldg:pm_ct2 .
+bldg:pm_ct2_pf      a brick:Power_Factor_Sensor  ; rdfs:label "PM-CT2 Power Factor" ; brick:isPointOf bldg:pm_ct2 .
+
+bldg:pm_ct3 a brick:Electrical_Meter ; rdfs:label "Cooling Tower CT-3 Sub-Meter (PM-CT3)" ; brick:meters bldg:cooling_tower_3 ; brick:hasPoint bldg:pm_ct3_voltage , bldg:pm_ct3_current , bldg:pm_ct3_power , bldg:pm_ct3_energy , bldg:pm_ct3_pf .
+bldg:pm_ct3_voltage a brick:Voltage_Sensor       ; rdfs:label "PM-CT3 Voltage (V)"  ; brick:isPointOf bldg:pm_ct3 .
+bldg:pm_ct3_current a brick:Current_Sensor       ; rdfs:label "PM-CT3 Current (A)"  ; brick:isPointOf bldg:pm_ct3 .
+bldg:pm_ct3_power   a brick:Electric_Power_Sensor; rdfs:label "PM-CT3 Power (kW)"   ; brick:isPointOf bldg:pm_ct3 .
+bldg:pm_ct3_energy  a brick:Electric_Energy_Sensor;rdfs:label "PM-CT3 Energy (kWh)"  ; brick:isPointOf bldg:pm_ct3 .
+bldg:pm_ct3_pf      a brick:Power_Factor_Sensor  ; rdfs:label "PM-CT3 Power Factor" ; brick:isPointOf bldg:pm_ct3 .
+
+# --- AHU Sub-Meters ---
+bldg:pm_ahu1 a brick:Electrical_Meter ; rdfs:label "AHU-F1 Sub-Meter (PM-AHU1)" ; brick:meters bldg:ahu_f1 ; brick:hasPoint bldg:pm_ahu1_voltage , bldg:pm_ahu1_current , bldg:pm_ahu1_power , bldg:pm_ahu1_energy , bldg:pm_ahu1_pf .
+bldg:pm_ahu1_voltage a brick:Voltage_Sensor       ; rdfs:label "PM-AHU1 Voltage (V)"  ; brick:isPointOf bldg:pm_ahu1 .
+bldg:pm_ahu1_current a brick:Current_Sensor       ; rdfs:label "PM-AHU1 Current (A)"  ; brick:isPointOf bldg:pm_ahu1 .
+bldg:pm_ahu1_power   a brick:Electric_Power_Sensor; rdfs:label "PM-AHU1 Power (kW)"   ; brick:isPointOf bldg:pm_ahu1 .
+bldg:pm_ahu1_energy  a brick:Electric_Energy_Sensor;rdfs:label "PM-AHU1 Energy (kWh)"  ; brick:isPointOf bldg:pm_ahu1 .
+bldg:pm_ahu1_pf      a brick:Power_Factor_Sensor  ; rdfs:label "PM-AHU1 Power Factor" ; brick:isPointOf bldg:pm_ahu1 .
+
+bldg:pm_ahu2 a brick:Electrical_Meter ; rdfs:label "AHU-F2 Sub-Meter (PM-AHU2)" ; brick:meters bldg:ahu_f2 ; brick:hasPoint bldg:pm_ahu2_voltage , bldg:pm_ahu2_current , bldg:pm_ahu2_power , bldg:pm_ahu2_energy , bldg:pm_ahu2_pf .
+bldg:pm_ahu2_voltage a brick:Voltage_Sensor       ; rdfs:label "PM-AHU2 Voltage (V)"  ; brick:isPointOf bldg:pm_ahu2 .
+bldg:pm_ahu2_current a brick:Current_Sensor       ; rdfs:label "PM-AHU2 Current (A)"  ; brick:isPointOf bldg:pm_ahu2 .
+bldg:pm_ahu2_power   a brick:Electric_Power_Sensor; rdfs:label "PM-AHU2 Power (kW)"   ; brick:isPointOf bldg:pm_ahu2 .
+bldg:pm_ahu2_energy  a brick:Electric_Energy_Sensor;rdfs:label "PM-AHU2 Energy (kWh)"  ; brick:isPointOf bldg:pm_ahu2 .
+bldg:pm_ahu2_pf      a brick:Power_Factor_Sensor  ; rdfs:label "PM-AHU2 Power Factor" ; brick:isPointOf bldg:pm_ahu2 .
+
+bldg:pm_ahu3 a brick:Electrical_Meter ; rdfs:label "AHU-F3 Sub-Meter (PM-AHU3)" ; brick:meters bldg:ahu_f3 ; brick:hasPoint bldg:pm_ahu3_voltage , bldg:pm_ahu3_current , bldg:pm_ahu3_power , bldg:pm_ahu3_energy , bldg:pm_ahu3_pf .
+bldg:pm_ahu3_voltage a brick:Voltage_Sensor       ; rdfs:label "PM-AHU3 Voltage (V)"  ; brick:isPointOf bldg:pm_ahu3 .
+bldg:pm_ahu3_current a brick:Current_Sensor       ; rdfs:label "PM-AHU3 Current (A)"  ; brick:isPointOf bldg:pm_ahu3 .
+bldg:pm_ahu3_power   a brick:Electric_Power_Sensor; rdfs:label "PM-AHU3 Power (kW)"   ; brick:isPointOf bldg:pm_ahu3 .
+bldg:pm_ahu3_energy  a brick:Electric_Energy_Sensor;rdfs:label "PM-AHU3 Energy (kWh)"  ; brick:isPointOf bldg:pm_ahu3 .
+bldg:pm_ahu3_pf      a brick:Power_Factor_Sensor  ; rdfs:label "PM-AHU3 Power Factor" ; brick:isPointOf bldg:pm_ahu3 .
+
+bldg:pm_ahu4 a brick:Electrical_Meter ; rdfs:label "AHU-F4 Sub-Meter (PM-AHU4)" ; brick:meters bldg:ahu_f4 ; brick:hasPoint bldg:pm_ahu4_voltage , bldg:pm_ahu4_current , bldg:pm_ahu4_power , bldg:pm_ahu4_energy , bldg:pm_ahu4_pf .
+bldg:pm_ahu4_voltage a brick:Voltage_Sensor       ; rdfs:label "PM-AHU4 Voltage (V)"  ; brick:isPointOf bldg:pm_ahu4 .
+bldg:pm_ahu4_current a brick:Current_Sensor       ; rdfs:label "PM-AHU4 Current (A)"  ; brick:isPointOf bldg:pm_ahu4 .
+bldg:pm_ahu4_power   a brick:Electric_Power_Sensor; rdfs:label "PM-AHU4 Power (kW)"   ; brick:isPointOf bldg:pm_ahu4 .
+bldg:pm_ahu4_energy  a brick:Electric_Energy_Sensor;rdfs:label "PM-AHU4 Energy (kWh)"  ; brick:isPointOf bldg:pm_ahu4 .
+bldg:pm_ahu4_pf      a brick:Power_Factor_Sensor  ; rdfs:label "PM-AHU4 Power Factor" ; brick:isPointOf bldg:pm_ahu4 .
+
+# =============================================================================
+# SECTION 11: SYSTEM FEED CHAINS (Refrigeration/Hydraulic Circuit)
+# Chillers → CHWPs → AHUs → VAVs → Zones
+# Cooling Towers → CDWPs → Chillers (condenser side)
+# =============================================================================
+
+# Chiller → Chilled Water Pump (supply side)
+bldg:chiller_1 brick:feeds bldg:chp_1 .
+bldg:chiller_2 brick:feeds bldg:chp_2 .
+bldg:chiller_3 brick:feeds bldg:chp_3 .
+
+# Chilled Water Pump → AHUs (distributed across floors)
+bldg:chp_1 brick:feeds bldg:ahu_f1 .
+bldg:chp_2 brick:feeds bldg:ahu_f2 .
+bldg:chp_3 brick:feeds bldg:ahu_f3 , bldg:ahu_f4 .
+
+# Cooling Tower → Condenser Water Pump (return side)
+bldg:cooling_tower_1 brick:feeds bldg:cdp_1 .
+bldg:cooling_tower_2 brick:feeds bldg:cdp_2 .
+bldg:cooling_tower_3 brick:feeds bldg:cdp_3 .
+
+# Condenser Water Pump → Chiller (condenser inlet)
+bldg:cdp_1 brick:feeds bldg:chiller_1 .
+bldg:cdp_2 brick:feeds bldg:chiller_2 .
+bldg:cdp_3 brick:feeds bldg:chiller_3 .
+
+# =============================================================================
+# END OF MODEL
+# Total entities: 1 Building, 4 Floors, 16 HVAC Zones,
+#   3 Chillers, 3 CHP, 3 CDP, 3 CT,
+#   4 AHUs, 16 VAVs,
+#   8 IAQ Sensors, 1 Weather Station,
+#   21 Power Meters
+# =============================================================================

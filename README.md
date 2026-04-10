@@ -18,6 +18,7 @@ A fully containerized **Building Automation System (BAS)** simulation for a 4-fl
 - [Project Structure](#project-structure)
 - [API Endpoints](#api-endpoints)
 - [MQTT Topics](#mqtt-topics)
+- [Bonus: Brick Schema Ontology](#bonus-brick-schema-ontology)
 
 ---
 
@@ -150,7 +151,7 @@ This simulation models a **4-floor commercial building** configured for Bangkok'
 
 | Equipment              | Qty | Specs                                  |
 |------------------------|-----|----------------------------------------|
-| Chillers (York/Carrier)| 3   | 500 RT each, R-134a, ~0.55 kW/RT      |
+| Chillers               | 3   | 500 RT each, R-134a, ~0.55 kW/RT      |
 | Chilled Water Pumps    | 3   | 37 kW, 1200 GPM, VSD                  |
 | Condenser Water Pumps  | 3   | 55 kW, 1500 GPM, VSD                  |
 | Cooling Towers         | 3   | 2 cells each, 5.5 kW/cell fan         |
@@ -330,6 +331,8 @@ IOTE-Practical-Assessment/
 │   │       └── api.ts              # API client & TypeScript types
 │   ├── Dockerfile
 │   └── package.json
+├── brick/
+│   └── building_model.ttl          # Brick Schema Ontology model (bonus)
 ├── docs/
 │   ├── network_diagram.png         # Physical network topology
 │   ├── system_stack_diagram.png    # Software architecture diagram
@@ -371,6 +374,120 @@ All device telemetry is published to the Mosquitto broker under structured topic
 | `building/modbus/power_meter/{id}`        | Modbus TCP | PM-MAIN + subs  |
 | `building/mqtt/iaq/{id}`                  | MQTT       | IAQ-F1A to F4B  |
 | `building/mqtt/weather/{id}`              | MQTT       | WS-ROOF         |
+
+---
+
+## Bonus: Brick Schema Ontology
+
+### What is Brick Schema?
+
+[Brick Schema](https://brickschema.org/) is an open-source, vendor-neutral RDF ontology for describing the physical and logical structure of buildings, their equipment, and data sources (sensors/actuators). It models a building as a **semantic graph**: nodes represent physical entities (chillers, AHUs, zones) and relationships between them (feeds, isPartOf, hasPoint) describe how the system is interconnected.
+
+A Brick model is written in **Turtle (`.ttl`)** format — a compact RDF serialization — and can be loaded into any SPARQL-compatible triple store for querying and reasoning.
+
+### Why Brick Matters for Building Automation Systems
+
+Traditional BAS deployments suffer from **metadata silos**: each vendor uses proprietary naming conventions, making it impossible to write portable analytics or fault-detection rules. Brick solves this by providing:
+
+| Feature | Benefit |
+|---|---|
+| **Standardized class hierarchy** | A `brick:Chilled_Water_Supply_Temperature_Sensor` means the same thing across all vendors and tools |
+| **Semantic relationships** | `brick:feeds` and `brick:isPartOf` let software automatically traverse the physical topology (chiller → pump → AHU → VAV → zone) without hardcoded logic |
+| **Platform interoperability** | Analytics platforms (Haystack, BuildingMOTIF, Mortar) and fault-detection systems can ingest a Brick model with zero configuration |
+| **Machine-readable metadata** | SPARQL queries can discover all temperature sensors in Zone 2A, or all equipment feeding Floor 3, without any domain-specific parser |
+
+### Building Model Structure
+
+The file `brick/building_model.ttl` models the full equipment hierarchy from this assessment:
+
+```
+bldg:building  (brick:Building)
+├── bldg:floor_1 … bldg:floor_4  (brick:Floor)
+│   └── bldg:zone_XA … zone_XD  (brick:HVAC_Zone)
+│
+├── Chiller Plant
+│   ├── bldg:chiller_1/2/3        (brick:Chiller)            ← 13 points each
+│   ├── bldg:chp_1/2/3            (brick:Chilled_Water_Pump) ← 6 points each
+│   ├── bldg:cdp_1/2/3            (brick:Condenser_Water_Pump)
+│   └── bldg:cooling_tower_1/2/3  (brick:Cooling_Tower)
+│
+├── Air Distribution
+│   ├── bldg:ahu_f1 … ahu_f4      (brick:AHU)  — 1 per floor, 7 points each
+│   └── bldg:vav_fX_Y             (brick:VAV)  — 4 per floor, 3 points each
+│
+├── Environmental
+│   ├── bldg:iaq_fXa / iaq_fXb    (brick:Air_Quality_Sensor) — 2 per floor
+│   └── bldg:weather_station       (brick:Weather_Station)
+│
+└── Electrical
+    ├── bldg:pm_main               (brick:Building_Electrical_Meter)
+    ├── bldg:pm_f1 … pm_f4         (brick:Electrical_Meter) — 1 per floor
+    └── bldg:pm_chY/chpY/cdpY/ctY/ahuY  (brick:Electrical_Meter) — equipment sub-meters
+```
+
+**Key relationships modelled:**
+
+```turtle
+# Chilled water supply chain
+bldg:chiller_1  brick:feeds  bldg:chp_1 .
+bldg:chp_1      brick:feeds  bldg:ahu_f1 .
+bldg:ahu_f1     brick:feeds  bldg:vav_f1_1 , bldg:vav_f1_2 , bldg:vav_f1_3 , bldg:vav_f1_4 .
+bldg:vav_f1_1   brick:feeds  bldg:zone_1A .
+
+# Condenser water return circuit
+bldg:cooling_tower_1  brick:feeds  bldg:cdp_1 .
+bldg:cdp_1            brick:feeds  bldg:chiller_1 .
+
+# Electrical metering
+bldg:pm_ch1  brick:meters  bldg:chiller_1 .
+bldg:pm_f1   brick:meters  bldg:floor_1 .
+```
+
+**Data point mapping example (Chiller sensors):**
+
+| Assessment Point | Brick Class |
+|---|---|
+| `evap_leaving_water_temperature` | `brick:Chilled_Water_Supply_Temperature_Sensor` |
+| `evap_entering_water_temperature` | `brick:Chilled_Water_Return_Temperature_Sensor` |
+| `evap_water_flow_rate` | `brick:Chilled_Water_Flow_Sensor` |
+| `status_read` | `brick:On_Off_Status` |
+| `status_write` | `brick:On_Off_Command` |
+| `power` | `brick:Electric_Power_Sensor` |
+| `co2` (IAQ) | `brick:CO2_Sensor` |
+| `pm25` (IAQ) | `brick:PM2.5_Sensor` |
+
+### Model Statistics
+
+| Category | Count |
+|---|---|
+| Spatial entities (Building + Floors + Zones) | 21 |
+| Equipment entities | 34 |
+| Point entities (sensors, commands, setpoints) | ~280 |
+| `brick:feeds` relationship triples | 28 |
+| `brick:meters` relationship triples | 21 |
+
+### Validating the Model
+
+Requires Python with `rdflib` installed (`pip install rdflib`):
+
+```python
+from rdflib import Graph, Namespace, RDF
+
+BRICK = Namespace("https://brickschema.org/schema/Brick#")
+
+g = Graph()
+g.parse("brick/building_model.ttl", format="turtle")
+
+for cls, label in [
+    (BRICK.Building, "Buildings"), (BRICK.Floor, "Floors"),
+    (BRICK.HVAC_Zone, "HVAC Zones"), (BRICK.Chiller, "Chillers"),
+    (BRICK.AHU, "AHUs"), (BRICK.VAV, "VAVs"),
+]:
+    count = sum(1 for _ in g.subjects(RDF.type, cls))
+    print(f"{label}: {count}")
+
+print(f"Total RDF triples: {len(g)}")
+```
 
 ---
 
