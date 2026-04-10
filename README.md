@@ -175,12 +175,12 @@ This simulation models a **4-floor commercial building** configured for Bangkok'
 | Meter Type             | Qty | Coverage                              |
 |------------------------|-----|---------------------------------------|
 | Main Building Meter    | 1   | Total building power consumption      |
-| Floor Sub-Meters       | 4   | 1 per floor (Floor 1–4)              |
-| Chiller Sub-Meters     | 3   | 1 per chiller (CH-1, CH-2, CH-3)    |
-| CHP Sub-Meters         | 3   | 1 per chilled water pump             |
-| CDP Sub-Meters         | 3   | 1 per condenser water pump           |
-| CT Sub-Meters          | 3   | 1 per cooling tower                  |
-| AHU Sub-Meters         | 4   | 1 per AHU                            |
+| Floor Sub-Meters       | 4   | 1 per floor (Floor 1–4)               |
+| Chiller Sub-Meters     | 3   | 1 per chiller (CH-1, CH-2, CH-3)      |
+| CHP Sub-Meters         | 3   | 1 per chilled water pump              |
+| CDP Sub-Meters         | 3   | 1 per condenser water pump            |
+| CT Sub-Meters          | 3   | 1 per cooling tower                   |
+| AHU Sub-Meters         | 4   | 1 per AHU                             |
 
 **Total: 21 power meters**
 
