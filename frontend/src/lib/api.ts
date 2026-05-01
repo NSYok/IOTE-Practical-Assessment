@@ -147,9 +147,39 @@ export interface ElectricalData {
   equipment_breakdown: Record<string, PowerMeter>;
 }
 
+// ─── History Types ──────────────────────────────────────────────────────────────
+export interface HistoryPoint {
+  timestamp: string;
+  device_id: string;
+  [key: string]: unknown;
+}
+
+export interface HistoryResponse {
+  data: HistoryPoint[];
+  minutes: number;
+}
+
 // ─── API Functions ─────────────────────────────────────────────────────────────
 export const fetchDashboard = () => fetchApi<DashboardData>('/api/dashboard');
 export const fetchChillerPlant = () => fetchApi<ChillerPlantData>('/api/chiller-plant');
 export const fetchAirDistribution = () => fetchApi<AirDistributionData>('/api/air-distribution');
 export const fetchElectrical = () => fetchApi<ElectricalData>('/api/electrical');
 export const fetchHealth = () => fetchApi<{ status: string }>('/api/health');
+
+// ─── History API Functions ─────────────────────────────────────────────────────
+export const fetchChillerHistory = (minutes = 30) =>
+  fetchApi<HistoryResponse>(`/api/history/chillers?minutes=${minutes}`);
+export const fetchPumpHistory = (minutes = 30) =>
+  fetchApi<HistoryResponse>(`/api/history/pumps?minutes=${minutes}`);
+export const fetchCoolingTowerHistory = (minutes = 30) =>
+  fetchApi<HistoryResponse>(`/api/history/cooling-towers?minutes=${minutes}`);
+export const fetchAhuHistory = (minutes = 30) =>
+  fetchApi<HistoryResponse>(`/api/history/ahus?minutes=${minutes}`);
+export const fetchVavHistory = (minutes = 30) =>
+  fetchApi<HistoryResponse>(`/api/history/vavs?minutes=${minutes}`);
+export const fetchIaqHistory = (minutes = 30) =>
+  fetchApi<HistoryResponse>(`/api/history/iaq?minutes=${minutes}`);
+export const fetchWeatherHistory = (minutes = 30) =>
+  fetchApi<HistoryResponse>(`/api/history/weather?minutes=${minutes}`);
+export const fetchPowerMeterHistory = (minutes = 30) =>
+  fetchApi<HistoryResponse>(`/api/history/power-meters?minutes=${minutes}`);

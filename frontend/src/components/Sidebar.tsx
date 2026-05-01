@@ -9,6 +9,7 @@ import {
   Zap,
   Building2,
   Activity,
+  BarChart3,
 } from 'lucide-react';
 
 const navItems = [
@@ -16,6 +17,10 @@ const navItems = [
   { href: '/chiller-plant', label: 'Chiller Plant', icon: Thermometer },
   { href: '/air-distribution', label: 'Air Distribution', icon: Wind },
   { href: '/electrical', label: 'Electrical', icon: Zap },
+];
+
+const analyticsItems = [
+  { href: '/analytics', label: 'Analytics', icon: BarChart3 },
 ];
 
 export default function Sidebar() {
@@ -68,6 +73,38 @@ export default function Sidebar() {
               }}
             >
               <Icon size={16} color={isActive ? '#3ecf8e' : '#4d4d4d'} />
+              {label}
+            </Link>
+          );
+        })}
+
+        <p style={{ fontFamily: 'Source Code Pro, monospace', fontSize: 10, color: '#4d4d4d', textTransform: 'uppercase', letterSpacing: '1.2px', padding: '16px 20px 4px' }}>
+          Analytics
+        </p>
+        {analyticsItems.map(({ href, label, icon: Icon }) => {
+          const isActive = pathname === href;
+          return (
+            <Link
+              key={href}
+              href={href}
+              style={{
+                display: 'flex',
+                alignItems: 'center',
+                gap: 10,
+                padding: '9px 20px',
+                marginLeft: 8,
+                marginRight: 8,
+                borderRadius: 6,
+                textDecoration: 'none',
+                fontSize: 14,
+                fontWeight: 500,
+                color: isActive ? '#fafafa' : '#898989',
+                backgroundColor: isActive ? '#171717' : 'transparent',
+                borderLeft: isActive ? '2px solid #a78bfa' : '2px solid transparent',
+                transition: 'all 0.15s ease',
+              }}
+            >
+              <Icon size={16} color={isActive ? '#a78bfa' : '#4d4d4d'} />
               {label}
             </Link>
           );

@@ -12,6 +12,7 @@ from backend.api.dashboard import router as dashboard_router
 from backend.api.chiller_plant import router as chiller_router
 from backend.api.air_distribution import router as air_router
 from backend.api.electrical import router as electrical_router
+from backend.api.history import router as history_router
 
 # Setup Logging
 logging.basicConfig(level=logging.INFO, format="%(asctime)s - %(levelname)s - %(name)s - %(message)s")
@@ -45,6 +46,7 @@ app.include_router(dashboard_router, prefix='/api/dashboard', tags=["Dashboard"]
 app.include_router(chiller_router, prefix='/api/chiller-plant', tags=["Chiller Plant"])
 app.include_router(air_router, prefix='/api/air-distribution', tags=["Air Distribution"])
 app.include_router(electrical_router, prefix='/api/electrical', tags=["Electrical"])
+app.include_router(history_router, prefix='/api/history', tags=["History"])
 
 @app.get('/api/health')
 def health_check():
